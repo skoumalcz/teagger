@@ -1,0 +1,53 @@
+plugins {
+    id("com.android.application")
+    id("teanity")
+}
+
+android {
+    compileSdkVersion(Sdk.compileSdk)
+
+    kotlinOptions {
+        freeCompilerArgs = ["-Xallow-result-return-type", "-Xuse-experimental=kotlin.Experimental"]
+        jvmTarget = "1.8"
+    }
+
+    defaultConfig {
+        applicationId "com.teagger.app"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        minSdkVersion(Sdk.minSdk)
+        targetSdkVersion(Sdk.targetSdk)
+    }
+
+    dataBinding {
+        enabled true
+    }
+
+    signingConfigs {
+        debug {
+            storeFile file("keystore.jks")
+            storePassword "debugdebug"
+            keyAlias "debug"
+            keyPassword "debugdebug"
+        }
+    }
+
+    buildTypes {
+        debug {
+            signingConfig signingConfigs.debug
+        }
+    }
+
+}
+
+teanity {
+    modules {
+        useUI = true
+    }
+    version {
+        versionType = com.skoumal.teanity.plugin.VersionType.SEMANTIC
+    }
+}
+
+dependencies {
+    implementation(project(":logger"))
+}

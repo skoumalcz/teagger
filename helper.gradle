@@ -1,0 +1,55 @@
+subprojects {
+    afterEvaluate {
+        if (!plugins.hasPlugin("com.android.library")) return
+
+        android {
+            compileSdkVersion(Sdk.compileSdk)
+
+            defaultConfig {
+                if (project.name == "test-ui") {
+                    minSdkVersion = 18
+                } else {
+                    minSdkVersion(Sdk.minSdk)
+                }
+                targetSdkVersion(Sdk.targetSdk)
+                versionCode = 1
+                versionName = "1.0"
+                multiDexEnabled true
+            }
+
+            kotlinOptions {
+                freeCompilerArgs = [
+                        "-Xallow-result-return-type",
+                        "-Xuse-experimental=kotlin.Experimental"
+                ]
+                jvmTarget = "1.8"
+            }
+
+            buildTypes {
+                release {
+                    minifyEnabled false
+                    shrinkResources false
+                }
+            }
+
+            testOptions {
+                animationsDisabled = false
+                unitTests {
+                    includeAndroidResources = true
+                    returnDefaultValues = true
+                }
+            }
+        }
+
+        dependencies {
+            testImplementation("junit:junit:4.12")
+            testImplementation("androidx.test:core:1.2.0")
+            testImplementation("org.mockito:mockito-core:3.0.0")
+
+            testImplementation("androidx.arch.core:core-testing:2.1.0")
+            testImplementation("androidx.test.ext:junit:1.1.1")
+            testImplementation("androidx.test.ext:truth:1.2.0")
+            testImplementation("com.google.truth:truth:1.0")
+        }
+    }
+}
