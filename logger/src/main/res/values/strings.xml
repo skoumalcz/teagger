@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">Teagger</string>
+    <string name="share">Share log</string>
+    <string name="wipe">Wipe log</string>
 </resources>

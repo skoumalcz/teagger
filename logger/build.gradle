@@ -12,6 +12,12 @@ android {
     }
 }
 
+teanity {
+    modules {
+        useUI = true
+    }
+}
+
 dependencies {
 
     implementation(Lib.kotlin.lib)

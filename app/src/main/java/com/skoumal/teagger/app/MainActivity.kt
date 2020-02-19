@@ -1,9 +1,11 @@
 package com.skoumal.teagger.app
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.skoumal.teagger.FileLogger
+import com.skoumal.teagger.LoggerActivity
 import java.io.File
 import java.util.*
 import kotlin.IllegalArgumentException
@@ -29,6 +31,6 @@ class MainActivity : AppCompatActivity() {
             Log.d("logger", s.nextLine())
         }
 
-        FileLogger.wipeLog()
+        startActivity(Intent(this, LoggerActivity::class.java))
     }
 }

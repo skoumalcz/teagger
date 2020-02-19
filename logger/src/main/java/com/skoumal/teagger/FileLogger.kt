@@ -16,7 +16,8 @@ object FileLogger {
                 if (exists().not())
                     createNewFile()
             }
-        } catch (ignored: Exception) {}
+        } catch (ignored: Exception) {
+        }
     }
 
     fun log(priority: Int, tag: String, message: String?, throwable: Throwable?) {
@@ -41,10 +42,19 @@ object FileLogger {
         }
     }
 
-    fun wipeLog() {
+    internal fun wipeLog() {
         try {
             file?.delete()
+            file?.createNewFile()
         } catch (ignored: Exception) {
         }
+    }
+
+    internal fun getLogAsString(): String {
+        try {
+            return file?.readText().orEmpty()
+        } catch (ignored: Exception) {
+        }
+        return ""
     }
 }

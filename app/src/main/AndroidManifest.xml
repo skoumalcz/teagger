@@ -17,5 +17,7 @@
             </intent-filter>
         </activity>
 
+        <activity android:name="com.skoumal.teagger.LoggerActivity" />
+
     </application>
 </manifest>
