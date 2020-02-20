@@ -7,7 +7,7 @@ class MyApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        FileLogger.init(this)
+        FileLogger.init(this, "com.teagger.fileprovider")
     }
 
 }

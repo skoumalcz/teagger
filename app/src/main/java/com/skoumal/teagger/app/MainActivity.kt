@@ -25,7 +25,7 @@ class MainActivity : AppCompatActivity() {
             FileLogger.log(Log.ERROR, "MainActivity", null, e)
         }
 
-        val f = File(filesDir, "teagger_log.txt")
+        val f = File(filesDir, "teagger/teagger_log.txt")
         val s = Scanner(f)
         while (s.hasNextLine()) {
             Log.d("logger", s.nextLine())

@@ -6,13 +6,20 @@ import java.io.File
 
 object FileLogger {
 
+    private const val LOG_DIRECTORY = "teagger"
     private const val LOG_FILENAME = "teagger_log.txt"
 
-    private var file: File? = null
+    internal var file: File? = null
+        private set
 
-    fun init(context: Context) {
+    internal lateinit var authority: String
+
+    fun init(context: Context, authority: String) {
+        this.authority = authority
         try {
-            file = File(context.filesDir, LOG_FILENAME).apply {
+            val dir = File(context.filesDir, LOG_DIRECTORY)
+            dir.mkdirs()
+            file = File(dir, LOG_FILENAME).apply {
                 if (exists().not())
                     createNewFile()
             }
