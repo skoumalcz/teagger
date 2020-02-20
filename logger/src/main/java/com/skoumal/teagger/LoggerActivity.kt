@@ -7,6 +7,9 @@ import com.skoumal.teagger.databinding.ActivityLoggerBinding
 import com.skoumal.teanity.view.TeanityActivity
 import com.skoumal.teanity.viewevent.base.ViewEvent
 
+/**
+ * Do not open this activity unless [FileLogger.init] has been called first.
+ */
 class LoggerActivity : TeanityActivity<LoggerViewModel, ActivityLoggerBinding>() {
     override val layoutRes = R.layout.activity_logger
     override val viewModel = LoggerViewModel()

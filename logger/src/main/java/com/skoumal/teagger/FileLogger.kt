@@ -14,6 +14,11 @@ object FileLogger {
 
     internal lateinit var authority: String
 
+    /**
+     * Call this method before any call to [log] or opening LoggerActivity, preferably in your Application implementation
+     * @param context can be application context, will be used to access internal files directory
+     * @param authority the authority to a FileProvider with access to the teagger/ directory in internal files dir
+     */
     fun init(context: Context, authority: String) {
         this.authority = authority
         try {
@@ -27,6 +32,13 @@ object FileLogger {
         }
     }
 
+    /**
+     * This method will not have any effect unless {@link #init} has been called.
+     * @param priority values from the [android.util.Log] class
+     * @param tag
+     * @param message
+     * @param throwable
+     */
     fun log(priority: Int, tag: String, message: String?, throwable: Throwable?) {
         val outputFile = file ?: return
 
