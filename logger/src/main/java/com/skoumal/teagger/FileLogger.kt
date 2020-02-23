@@ -3,6 +3,8 @@ package com.skoumal.teagger
 import android.content.Context
 import android.util.Log
 import java.io.File
+import java.io.PrintWriter
+import java.io.StringWriter
 
 object FileLogger {
 
@@ -10,26 +12,21 @@ object FileLogger {
     private const val LOG_FILENAME = "teagger_log.txt"
 
     internal var file: File? = null
-        private set
+
+    internal var filesDir: File? = null
 
     internal lateinit var authority: String
+        private set
 
     /**
-     * Call this method before any call to [log] or opening LoggerActivity, preferably in your Application implementation
+     * Call this method before any call to [log] or opening LoggerActivity,
+     * preferably in your Application implementation
      * @param context can be application context, will be used to access internal files directory
      * @param authority the authority to a FileProvider with access to the teagger/ directory in internal files dir
      */
     fun init(context: Context, authority: String) {
+        filesDir = context.filesDir
         this.authority = authority
-        try {
-            val dir = File(context.filesDir, LOG_DIRECTORY)
-            dir.mkdirs()
-            file = File(dir, LOG_FILENAME).apply {
-                if (exists().not())
-                    createNewFile()
-            }
-        } catch (ignored: Exception) {
-        }
     }
 
     /**
@@ -40,8 +37,11 @@ object FileLogger {
      * @param throwable
      */
     fun log(priority: Int, tag: String, message: String?, throwable: Throwable?) {
-        val outputFile = file ?: return
+        val outputFile = file ?: createFile() ?: return
+        outputFile.appendText(entryFor(priority, tag, message, throwable))
+    }
 
+    internal fun entryFor(priority: Int, tag: String, message: String?, throwable: Throwable?): String {
         val priorityString = when (priority) {
             Log.ASSERT -> "A"
             Log.DEBUG -> "D"
@@ -52,28 +52,52 @@ object FileLogger {
             else -> ""
         }
 
-        val entry = "$priorityString/$tag: ${message.orEmpty()}"
-        try {
+        val basicEntry = "$priorityString/$tag: ${message.orEmpty()}"
+        var entry = ""
+        runCatching {
             throwable?.let {
-                outputFile.appendText("$entry ${Log.getStackTraceString(it)}\n")
-            } ?: outputFile.appendText("$entry\n")
-        } catch (ignored: Exception) {
+                entry = "$basicEntry ${it.getStackTraceString()}\n"
+            } ?: "$basicEntry\n".let { entry = it }
         }
+
+        return entry
+    }
+
+    internal fun File.createLogDir() = runCatching {
+        mkdirs()
+        this
+    }.getOrNull()
+
+    internal fun File.createLog() = runCatching {
+        createNewFile()
+        file = this
+        file
+    }.getOrNull()
+
+    private fun createFile() = File(filesDir, LOG_DIRECTORY).createLogDir()?.let {
+        File(it, LOG_FILENAME).createLog()
     }
 
     internal fun wipeLog() {
-        try {
+        runCatching {
             file?.delete()
             file?.createNewFile()
-        } catch (ignored: Exception) {
         }
     }
 
-    internal fun getLogAsString(): String {
-        try {
-            return file?.readText().orEmpty()
-        } catch (ignored: Exception) {
-        }
-        return ""
+    internal fun getLogAsString() = runCatching {
+        file?.readText()
+    }.getOrNull().orEmpty()
+
+    /**
+     * Testable alternative to [Log.getStackTraceString]
+     */
+    internal fun Throwable.getStackTraceString(): String {
+        val stringWriter = StringWriter()
+        val printWriter = PrintWriter(stringWriter, false)
+        printStackTrace(printWriter)
+        printWriter.close()
+        return stringWriter.toString()
     }
+
 }
