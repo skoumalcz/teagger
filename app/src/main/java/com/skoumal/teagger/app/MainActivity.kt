@@ -4,8 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import com.skoumal.teagger.FileLogger
-import com.skoumal.teagger.LoggerActivity
 import java.io.File
 import java.util.*
 import kotlin.IllegalArgumentException
@@ -16,13 +14,13 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         for (i in 0 until 100) {
-            FileLogger.log(Log.DEBUG, "MainActivity", "message $i", null)
+            MyApplication.fileLogger.log(Log.DEBUG, "MainActivity", "message $i", null)
         }
 
         try {
             throw IllegalArgumentException("test")
         } catch (e: IllegalArgumentException) {
-            FileLogger.log(Log.ERROR, "MainActivity", null, e)
+            MyApplication.fileLogger.log(Log.ERROR, "MainActivity", null, e)
         }
 
         val f = File(filesDir, "teagger/teagger_log.txt")
@@ -31,6 +29,6 @@ class MainActivity : AppCompatActivity() {
             Log.d("logger", s.nextLine())
         }
 
-        startActivity(Intent(this, LoggerActivity::class.java))
+        startActivity(Intent(this, MyLoggerActivity::class.java))
     }
 }

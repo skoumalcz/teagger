@@ -17,7 +17,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="com.skoumal.teagger.LoggerActivity" />
+        <activity android:name=".MyLoggerActivity" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

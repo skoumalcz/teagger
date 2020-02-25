@@ -12,33 +12,33 @@ import com.skoumal.teanity.viewevent.base.ViewEvent
 import com.skoumal.teanity.viewmodel.TeanityViewModel
 import kotlinx.coroutines.launch
 
-class LoggerViewModel : TeanityViewModel() {
+class LoggerViewModel(private val fileLogger: FileLogger) : TeanityViewModel() {
 
     val binding = bindingOf<LogLineItem> { }
     val items = ObservableArrayList<LogLineItem>()
 
     init {
         launch {
-            FileLogger.getLogAsString().split('\n').forEach {
+            fileLogger.getLogAsString().split('\n').forEach {
                 items += LogLineItem(it)
             }
         }
     }
 
     fun sendLog() {
-        FileLogger.file?.let {
-            SendLogEvent().publish()
+        fileLogger.file?.let {
+            SendLogEvent(fileLogger).publish()
         }
     }
 
     fun wipeLog() {
-        FileLogger.wipeLog()
+        fileLogger.wipeLog()
         FinishActivityEvent.publish()
     }
 
-    class SendLogEvent : ViewEvent(), ContextExecutor {
+    class SendLogEvent(private val fileLogger: FileLogger) : ViewEvent(), ContextExecutor {
         override fun invoke(context: Context) {
-            FileLogger.shareLog(context)
+            fileLogger.shareLog(context)
         }
     }
 

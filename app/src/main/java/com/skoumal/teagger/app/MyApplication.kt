@@ -5,9 +5,12 @@ import com.skoumal.teagger.FileLogger
 
 class MyApplication : Application() {
 
-    override fun onCreate() {
-        super.onCreate()
-        FileLogger.init(this, "com.teagger.fileprovider")
+    companion object {
+        lateinit var fileLogger: FileLogger
     }
 
+    override fun onCreate() {
+        super.onCreate()
+        fileLogger = FileLogger(this, "com.teagger.fileprovider")
+    }
 }
