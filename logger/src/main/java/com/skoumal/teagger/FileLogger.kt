@@ -42,6 +42,19 @@ class FileLogger(context: Context, authority: String) {
         outputFile.appendText(entryFor(priority, tag, message, throwable))
     }
 
+    fun v(tag: String, message: String?, throwable: Throwable?) =
+        log(Log.VERBOSE, tag, message, throwable)
+    fun d(tag: String, message: String?, throwable: Throwable?) =
+        log(Log.DEBUG, tag, message, throwable)
+    fun i(tag: String, message: String?, throwable: Throwable?) =
+        log(Log.INFO, tag, message, throwable)
+    fun w(tag: String, message: String?, throwable: Throwable?) =
+        log(Log.WARN, tag, message, throwable)
+    fun e(tag: String, message: String?, throwable: Throwable?) =
+        log(Log.ERROR, tag, message, throwable)
+    fun wtf(tag: String, message: String?, throwable: Throwable?) =
+            log(Log.ASSERT, tag, message, throwable)
+
     /**
      * Opens a share activity for the log file.
      * @param context can be application context, will be used to get the URI and start the activity
