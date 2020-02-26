@@ -10,7 +10,7 @@ import org.mockito.Mock
 import org.mockito.Mockito
 import java.io.File
 
-class FileLoggerTest {
+class StreamLoggerTest {
 
     @Mock
     lateinit var context: Context
@@ -37,8 +37,8 @@ class FileLoggerTest {
             throw SecurityException()
         }
 
-        FileLogger.filesDir = null
-        FileLogger.file = null
+        StreamLogger.filesDir = null
+        StreamLogger.file = null
         //FileLogger.authority = null
 
         Mockito.`when`(context.filesDir).thenReturn(filesDir)
@@ -56,15 +56,15 @@ class FileLoggerTest {
     @Test
     fun init() {
         val authority = "com.skoumal.authority"
-        FileLogger.init(context, authority)
+        StreamLogger.init(context, authority)
 
-        assertEquals(filesDir, FileLogger.filesDir)
-        assertEquals(authority, FileLogger.authority)
+        assertEquals(filesDir, StreamLogger.filesDir)
+        assertEquals(authority, StreamLogger.authority)
     }
 
     @Test
     fun createLogDir_callsMkdirs() {
-        val dir = FileLogger.run {
+        val dir = StreamLogger.run {
             logDir.createLogDir()
         }
 
@@ -74,7 +74,7 @@ class FileLoggerTest {
 
     @Test
     fun createLogDir_swallowsExceptions() {
-        val dir = FileLogger.run {
+        val dir = StreamLogger.run {
             fileThrowing.createLogDir()
         }
 
@@ -83,18 +83,18 @@ class FileLoggerTest {
 
     @Test
     fun createLogFile_assignsCreatedFile() {
-        val fileResult = FileLogger.run {
+        val fileResult = StreamLogger.run {
             logFile.createLog()
         }
 
         assertEquals(logFile, fileResult)
-        assertEquals(logFile, FileLogger.file)
+        assertEquals(logFile, StreamLogger.file)
         assert(logFile.isFile)
     }
 
     @Test
     fun createLogFile_swallowsExceptions() {
-        val file = FileLogger.run {
+        val file = StreamLogger.run {
             fileThrowing.createLog()
         }
 
@@ -106,23 +106,23 @@ class FileLoggerTest {
         val tag = "Test"
         val message = "Test message"
 
-        var entry = FileLogger.entryFor(Log.DEBUG, tag, message, null)
+        var entry = StreamLogger.entryFor(Log.DEBUG, tag, message, null)
         assert(entry.startsWith("D"))
         assert(entry.contains(tag))
         assert(entry.contains(message))
 
         val throwable = getThrowableWithStackTrace()
 
-        entry = FileLogger.entryFor(Log.ERROR, tag, null, throwable)
+        entry = StreamLogger.entryFor(Log.ERROR, tag, null, throwable)
         assert(entry.startsWith("E"))
         assert(entry.contains(tag))
-        assert(entry.contains(FileLogger.run { throwable!!.getStackTraceString() }))
+        assert(entry.contains(StreamLogger.run { throwable!!.getStackTraceString() }))
     }
 
     @Test
     fun getStackTraceString_containsKnownClassNames() {
         val throwable = getThrowableWithStackTrace()
-        val stackTrace = FileLogger.run {
+        val stackTrace = StreamLogger.run {
             throwable?.getStackTraceString() ?: ""
         }
 
@@ -133,15 +133,15 @@ class FileLoggerTest {
     @Test
     fun wipeLog_swallowsExceptions() {
         // FileLogger.file is now null
-        FileLogger.wipeLog()
+        StreamLogger.wipeLog()
 
-        FileLogger.file = fileThrowing
-        FileLogger.wipeLog()
+        StreamLogger.file = fileThrowing
+        StreamLogger.wipeLog()
     }
 
     @Test
     fun getLogAsString_EmptyStringOnFileNull() {
-        assertEquals("", FileLogger.getLogAsString())
+        assertEquals("", StreamLogger.getLogAsString())
     }
 
     private fun getThrowableWithStackTrace(): Throwable? {

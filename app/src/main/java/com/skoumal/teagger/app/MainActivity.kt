@@ -14,16 +14,16 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         for (i in 0 until 100) {
-            MyApplication.fileLogger.log(Log.DEBUG, "MainActivity", "message $i", null)
+            MyApplication.streamLogger.log(Log.DEBUG, "MainActivity", "message $i", null)
         }
 
         try {
             throw IllegalArgumentException("test")
         } catch (e: IllegalArgumentException) {
-            MyApplication.fileLogger.log(Log.ERROR, "MainActivity", null, e)
+            MyApplication.streamLogger.log(Log.ERROR, "MainActivity", null, e)
         }
 
-        val f = File(filesDir, "teagger/teagger_log.txt")
+        val f = File(filesDir, "teaggerlog")
         val s = Scanner(f)
         while (s.hasNextLine()) {
             Log.d("logger", s.nextLine())

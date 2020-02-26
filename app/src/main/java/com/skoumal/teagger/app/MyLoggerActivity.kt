@@ -5,7 +5,7 @@ import com.skoumal.teagger.LoggerViewModel
 
 class MyLoggerActivity : LoggerActivity() {
 
-    override val fileLogger = MyApplication.fileLogger
+    override val streamLogger = MyApplication.streamLogger
 
-    override val viewModel = LoggerViewModel(fileLogger)
+    override val viewModel = LoggerViewModel(streamLogger)
 }

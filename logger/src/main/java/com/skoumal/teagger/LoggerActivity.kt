@@ -7,5 +7,5 @@ abstract class LoggerActivity : TeanityActivity<LoggerViewModel, ActivityLoggerB
     override val layoutRes = R.layout.activity_logger
     abstract override val viewModel: LoggerViewModel
 
-    abstract val fileLogger: FileLogger
+    abstract val streamLogger: StreamLogger
 }

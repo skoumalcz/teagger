@@ -4,30 +4,20 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
-import androidx.core.content.FileProvider
-import java.io.File
-import java.io.PrintWriter
-import java.io.StringWriter
+import java.io.*
+import androidx.core.content.FileProvider as AndroidFileProvider
 
-class FileLogger(context: Context, authority: String) {
+class StreamLogger(
+        var outputStreamProvider: OutputStreamProvider?,
+        var inputStreamProvider: InputStreamProvider?,
+        var clearFunction: (() -> Unit)?
+) {
+
+    constructor() : this(null, null, null)
 
     companion object {
-        private const val LOG_DIRECTORY = "teagger"
-        private const val LOG_FILENAME = "teagger_log.txt"
-    }
-
-    internal var file: File? = null
-        private set
-
-    internal var filesDir: File
-        private set
-
-    internal var authority: String
-        private set
-
-    init {
-        filesDir = context.filesDir
-        this.authority = authority
+        private const val CACHE_DIR = "teagger/"
+        private const val CACHE_SHARED_FILE = "sharedlog.txt"
     }
 
     /**
@@ -38,30 +28,40 @@ class FileLogger(context: Context, authority: String) {
      * @param throwable
      */
     fun log(priority: Int, tag: String, message: String?, throwable: Throwable?) {
-        val outputFile = file ?: createFile() ?: return
-        outputFile.appendText(entryFor(priority, tag, message, throwable))
+        runCatching {
+            outputStreamProvider?.provideOutputStream()?.bufferedWriter()?.use {
+                it.write(entryFor(priority, tag, message, throwable))
+            }
+        }
     }
 
     fun v(tag: String, message: String?, throwable: Throwable?) =
-        log(Log.VERBOSE, tag, message, throwable)
+            log(Log.VERBOSE, tag, message, throwable)
+
     fun d(tag: String, message: String?, throwable: Throwable?) =
-        log(Log.DEBUG, tag, message, throwable)
+            log(Log.DEBUG, tag, message, throwable)
+
     fun i(tag: String, message: String?, throwable: Throwable?) =
-        log(Log.INFO, tag, message, throwable)
+            log(Log.INFO, tag, message, throwable)
+
     fun w(tag: String, message: String?, throwable: Throwable?) =
-        log(Log.WARN, tag, message, throwable)
+            log(Log.WARN, tag, message, throwable)
+
     fun e(tag: String, message: String?, throwable: Throwable?) =
-        log(Log.ERROR, tag, message, throwable)
+            log(Log.ERROR, tag, message, throwable)
+
     fun wtf(tag: String, message: String?, throwable: Throwable?) =
             log(Log.ASSERT, tag, message, throwable)
 
     /**
-     * Opens a share activity for the log file.
+     * Opens a share activity for a log file.
      * @param context can be application context, will be used to get the URI and start the activity
+     * @param authority authority of the [androidx.core.content.FileProvider] that has access to the teagger/ directory in cache
      */
-    fun shareLog(context: Context) {
-        val sharedFile = file ?: return
-        val contentUri: Uri = FileProvider.getUriForFile(context, authority, sharedFile)
+    fun shareLog(context: Context, authority: String) {
+        val file = getFileForSharing(context) ?: return
+
+        val contentUri: Uri = AndroidFileProvider.getUriForFile(context, authority, file)
         val sendIntent: Intent = Intent().apply {
             action = Intent.ACTION_SEND
             putExtra(Intent.EXTRA_STREAM, contentUri)
@@ -99,31 +99,26 @@ class FileLogger(context: Context, authority: String) {
         return entry
     }
 
-    internal fun File.createLogDir() = runCatching {
-        mkdirs()
-        this
-    }.getOrNull()
-
-    internal fun File.createLog() = runCatching {
-        createNewFile()
-        file = this
-        file
-    }.getOrNull()
-
-    private fun createFile() = File(filesDir, LOG_DIRECTORY).createLogDir()?.let {
-        File(it, LOG_FILENAME).createLog()
-    }
-
-    internal fun wipeLog() {
-        runCatching {
-            file?.delete()
-            file?.createNewFile()
-        }
-    }
+    internal fun wipeLog() = clearFunction?.invoke()
 
     internal fun getLogAsString() = runCatching {
-        file?.readText()
+        inputStreamProvider?.provideInputStream()?.bufferedReader()?.use {
+            it.readText()
+        }
     }.getOrNull().orEmpty()
+
+    internal fun getFileForSharing(context: Context) = runCatching {
+        val string = getLogAsString()
+        val dir = File(context.cacheDir, CACHE_DIR)
+        dir.mkdirs()
+        val file = File(dir, CACHE_SHARED_FILE)
+        file.delete()
+        file.createNewFile()
+        file.outputStream().bufferedWriter().use {
+            it.write(string)
+        }
+        file
+    }.getOrNull()
 
     /**
      * Testable alternative to [Log.getStackTraceString]
