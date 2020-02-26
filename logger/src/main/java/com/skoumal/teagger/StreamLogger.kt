@@ -4,8 +4,8 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
+import androidx.core.content.FileProvider
 import java.io.*
-import androidx.core.content.FileProvider as AndroidFileProvider
 
 class StreamLogger(
         var outputStreamProvider: OutputStreamProvider?,
@@ -29,8 +29,16 @@ class StreamLogger(
      */
     fun log(priority: Int, tag: String, message: String?, throwable: Throwable?) {
         runCatching {
-            outputStreamProvider?.provideOutputStream()?.bufferedWriter()?.use {
-                it.write(entryFor(priority, tag, message, throwable))
+            val outputStream = outputStreamProvider?.provideOutputStream() ?: return@runCatching
+            PrintStream(outputStream).use { stream ->
+                stream.print(entryFor(priority, tag, message))
+                runCatching {
+                    throwable?.let {
+                        stream.print(" ")
+                        throwable.printStackTrace(stream)
+                    }
+                }
+                stream.println()
             }
         }
     }
@@ -61,7 +69,7 @@ class StreamLogger(
     fun shareLog(context: Context, authority: String) {
         val file = getFileForSharing(context) ?: return
 
-        val contentUri: Uri = AndroidFileProvider.getUriForFile(context, authority, file)
+        val contentUri: Uri = FileProvider.getUriForFile(context, authority, file)
         val sendIntent: Intent = Intent().apply {
             action = Intent.ACTION_SEND
             putExtra(Intent.EXTRA_STREAM, contentUri)
@@ -75,8 +83,7 @@ class StreamLogger(
     internal fun entryFor(
             priority: Int,
             tag: String,
-            message: String?,
-            throwable: Throwable?
+            message: String?
     ): String {
         val priorityString = when (priority) {
             Log.ASSERT -> "A"
@@ -88,15 +95,7 @@ class StreamLogger(
             else -> ""
         }
 
-        val basicEntry = "$priorityString/$tag: ${message.orEmpty()}"
-        var entry = ""
-        runCatching {
-            throwable?.let {
-                entry = "$basicEntry ${it.getStackTraceString()}\n"
-            } ?: "$basicEntry\n".let { entry = it }
-        }
-
-        return entry
+        return "$priorityString/$tag: ${message.orEmpty()}"
     }
 
     internal fun wipeLog() = clearFunction?.invoke()
@@ -119,16 +118,4 @@ class StreamLogger(
         }
         file
     }.getOrNull()
-
-    /**
-     * Testable alternative to [Log.getStackTraceString]
-     */
-    internal fun Throwable.getStackTraceString(): String {
-        val stringWriter = StringWriter()
-        val printWriter = PrintWriter(stringWriter, false)
-        printStackTrace(printWriter)
-        printWriter.close()
-        return stringWriter.toString()
-    }
-
 }
