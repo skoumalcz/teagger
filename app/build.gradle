@@ -16,6 +16,7 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         minSdkVersion(Sdk.minSdk)
         targetSdkVersion(Sdk.targetSdk)
+        multiDexEnabled true
     }
 
     dataBinding {
@@ -50,4 +51,5 @@ teanity {
 
 dependencies {
     implementation(project(":logger"))
+    implementation(project(":logger-ui"))
 }

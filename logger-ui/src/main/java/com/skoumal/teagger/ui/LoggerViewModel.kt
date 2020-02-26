@@ -1,8 +1,9 @@
-package com.skoumal.teagger
+package com.skoumal.teagger.ui
 
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.ObservableArrayList
+import com.skoumal.teagger.StreamLogger
 import com.skoumal.teanity.databinding.GenericRvItem
 import com.skoumal.teanity.extensions.bindingOf
 import com.skoumal.teanity.extensions.compareToSafe

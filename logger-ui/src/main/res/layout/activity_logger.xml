@@ -6,7 +6,7 @@
 
         <variable
             name="viewModel"
-            type="com.skoumal.teagger.LoggerViewModel" />
+            type="com.skoumal.teagger.ui.LoggerViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

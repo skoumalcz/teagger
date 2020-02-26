@@ -1,6 +1,7 @@
-package com.skoumal.teagger
+package com.skoumal.teagger.ui
 
-import com.skoumal.teagger.databinding.ActivityLoggerBinding
+import com.skoumal.teagger.StreamLogger
+import com.skoumal.teagger.ui.databinding.ActivityLoggerBinding
 import com.skoumal.teanity.view.TeanityActivity
 
 abstract class LoggerActivity : TeanityActivity<LoggerViewModel, ActivityLoggerBinding>() {

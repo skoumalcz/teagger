@@ -5,7 +5,7 @@
 
         <variable
             name="item"
-            type="com.skoumal.teagger.LoggerViewModel.LogLineItem" />
+            type="com.skoumal.teagger.ui.LoggerViewModel.LogLineItem" />
 
     </data>
 

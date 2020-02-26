@@ -80,6 +80,14 @@ class StreamLogger(
         context.startActivity(shareIntent)
     }
 
+    fun getLogAsString() = runCatching {
+        inputStreamProvider?.provideInputStream()?.bufferedReader()?.use {
+            it.readText()
+        }
+    }.getOrNull().orEmpty()
+
+    fun wipeLog() = clearFunction?.invoke()
+
     internal fun entryFor(
             priority: Int,
             tag: String,
@@ -97,14 +105,6 @@ class StreamLogger(
 
         return "$priorityString/$tag: ${message.orEmpty()}"
     }
-
-    internal fun wipeLog() = clearFunction?.invoke()
-
-    internal fun getLogAsString() = runCatching {
-        inputStreamProvider?.provideInputStream()?.bufferedReader()?.use {
-            it.readText()
-        }
-    }.getOrNull().orEmpty()
 
     internal fun getFileForSharing(context: Context) = runCatching {
         val string = getLogAsString()
