@@ -1,104 +1,112 @@
 package com.skoumal.teagger
 
-import android.content.Context
 import android.util.Log
-import org.junit.Test
-
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
 import org.junit.Before
-import org.mockito.Mock
-import org.mockito.Mockito
-import java.io.File
+import org.junit.Test
+import java.io.ByteArrayOutputStream
+import java.io.InputStream
+import java.lang.RuntimeException
 
 class StreamLoggerTest {
 
-    @Mock
-    lateinit var context: Context
+    private lateinit var logger: StreamLogger
+    private lateinit var loggedContent: String
 
-    @Mock
-    lateinit var filesDir: File
-
-    @Mock
-    lateinit var logDir: File
-
-    @Mock
-    lateinit var logFile: File
-
-    @Mock
-    lateinit var fileThrowing: File
+    private lateinit var outputStreamProvider: OutputStreamProvider
+    private lateinit var inputStreamProvider: InputStreamProvider
+    private val clearCallback = {
+        loggedContent = ""
+    }
 
     @Before
     fun prepare() {
-        context = Mockito.mock(Context::class.java)
-        filesDir = Mockito.mock(File::class.java)
-        logDir = Mockito.mock(File::class.java)
-        logFile = Mockito.mock(File::class.java)
-        fileThrowing = Mockito.mock(File::class.java) {
-            throw SecurityException()
+        loggedContent = ""
+
+        outputStreamProvider = object : OutputStreamProvider {
+            override fun provideOutputStream() = object : ByteArrayOutputStream() {
+                override fun close() {
+                    super.close()
+                    loggedContent += this.toString()
+                }
+            }
+
         }
 
-        StreamLogger.filesDir = null
-        StreamLogger.file = null
-        //FileLogger.authority = null
-
-        Mockito.`when`(context.filesDir).thenReturn(filesDir)
-        Mockito.`when`(logDir.mkdirs()).then {
-            Mockito.`when`(logDir.isDirectory).thenReturn(true)
-            true
+        inputStreamProvider = object : InputStreamProvider {
+            override fun provideInputStream() = loggedContent.byteInputStream()
         }
 
-        Mockito.`when`(logFile.createNewFile()).then {
-            Mockito.`when`(logFile.isFile).thenReturn(true)
-            true
-        }
+        logger = StreamLogger(outputStreamProvider, inputStreamProvider, clearCallback)
     }
 
     @Test
-    fun init() {
-        val authority = "com.skoumal.authority"
-        StreamLogger.init(context, authority)
+    fun log_appendsEntries() {
+        val tag = "Test"
+        var message = "Test message"
 
-        assertEquals(filesDir, StreamLogger.filesDir)
-        assertEquals(authority, StreamLogger.authority)
+        val entry1 = logger.entryFor(Log.DEBUG, tag, message)
+        logger.log(Log.DEBUG, tag, message, null)
+
+        message = "Test message 2"
+        val entry2 = logger.entryFor(Log.WARN, tag, message)
+        val throwable = getThrowableWithStackTrace()
+        val exceptionName = throwable::class.java.name
+        logger.log(Log.WARN, tag, message, throwable)
+
+        assert(loggedContent.startsWith(entry1))
+        assert(loggedContent.substringAfter(entry1).trim().startsWith(entry2))
+        assert(loggedContent.substringAfter(entry2).trim().startsWith(exceptionName))
     }
 
     @Test
-    fun createLogDir_callsMkdirs() {
-        val dir = StreamLogger.run {
-            logDir.createLogDir()
+    fun log_swallowsExceptions() {
+        logger.outputStreamProvider = object : OutputStreamProvider {
+            override fun provideOutputStream() = object : ByteArrayOutputStream() {
+                override fun close() {
+                    super.close()
+                    throw RuntimeException()
+                }
+            }
         }
 
-        assert(logDir.isDirectory)
-        assertEquals(logDir, dir)
+        logger.log(Log.VERBOSE, "tag", "message", null)
     }
 
     @Test
-    fun createLogDir_swallowsExceptions() {
-        val dir = StreamLogger.run {
-            fileThrowing.createLogDir()
-        }
+    fun logFunctions_appendCorrectEntries() {
+        val tag = "Tag"
 
-        assertNull(dir)
-    }
+        var message = "debug message"
+        val entryDebug = logger.entryFor(Log.DEBUG, tag, message)
+        logger.d(tag, message, null)
 
-    @Test
-    fun createLogFile_assignsCreatedFile() {
-        val fileResult = StreamLogger.run {
-            logFile.createLog()
-        }
+        message = "info message"
+        val entryInfo = logger.entryFor(Log.INFO, tag, message)
+        logger.i(tag, message, null)
 
-        assertEquals(logFile, fileResult)
-        assertEquals(logFile, StreamLogger.file)
-        assert(logFile.isFile)
-    }
+        message = "verbose message"
+        val entryVerbose = logger.entryFor(Log.VERBOSE, tag, message)
+        logger.v(tag, message, null)
 
-    @Test
-    fun createLogFile_swallowsExceptions() {
-        val file = StreamLogger.run {
-            fileThrowing.createLog()
-        }
+        message = "warn message"
+        val entryWarn = logger.entryFor(Log.WARN, tag, message)
+        logger.w(tag, message, null)
 
-        assertNull(file)
+        message = "error message"
+        val entryError = logger.entryFor(Log.ERROR, tag, message)
+        logger.e(tag, message, null)
+
+        message = "assert message"
+        val entryAssert = logger.entryFor(Log.ASSERT, tag, message)
+        logger.wtf(tag, message, null)
+
+        assert(loggedContent.startsWith(entryDebug))
+        assert(loggedContent.substringAfter(entryDebug).trim().startsWith(entryInfo))
+        assert(loggedContent.substringAfter(entryInfo).trim().startsWith(entryVerbose))
+        assert(loggedContent.substringAfter(entryVerbose).trim().startsWith(entryWarn))
+        assert(loggedContent.substringAfter(entryWarn).trim().startsWith(entryError))
+        assert(loggedContent.substringAfter(entryError).trim().startsWith(entryAssert))
     }
 
     @Test
@@ -106,50 +114,55 @@ class StreamLoggerTest {
         val tag = "Test"
         val message = "Test message"
 
-        var entry = StreamLogger.entryFor(Log.DEBUG, tag, message, null)
+        var entry = logger.entryFor(Log.DEBUG, tag, message)
         assert(entry.startsWith("D"))
         assert(entry.contains(tag))
         assert(entry.contains(message))
 
-        val throwable = getThrowableWithStackTrace()
-
-        entry = StreamLogger.entryFor(Log.ERROR, tag, null, throwable)
-        assert(entry.startsWith("E"))
+        entry = logger.entryFor(Log.ASSERT, tag, message)
+        assert(entry.startsWith("A"))
         assert(entry.contains(tag))
-        assert(entry.contains(StreamLogger.run { throwable!!.getStackTraceString() }))
+        assert(entry.contains(message))
     }
 
     @Test
-    fun getStackTraceString_containsKnownClassNames() {
-        val throwable = getThrowableWithStackTrace()
-        val stackTrace = StreamLogger.run {
-            throwable?.getStackTraceString() ?: ""
-        }
-
-        assert(stackTrace.contains(throwable!!::class.java.simpleName))
-        assert(stackTrace.contains(this::class.java.simpleName))
+    fun wipeLog_callsCallback() {
+        loggedContent = "content to be wiped"
+        logger.wipeLog()
+        assertEquals("", loggedContent)
     }
 
     @Test
     fun wipeLog_swallowsExceptions() {
-        // FileLogger.file is now null
-        StreamLogger.wipeLog()
-
-        StreamLogger.file = fileThrowing
-        StreamLogger.wipeLog()
+        logger.clearFunction = {
+            throw RuntimeException()
+        }
+        logger.wipeLog()
     }
 
     @Test
-    fun getLogAsString_EmptyStringOnFileNull() {
-        assertEquals("", StreamLogger.getLogAsString())
+    fun getLogAsString_returnsFullLog() {
+        loggedContent = "logged content"
+        assertEquals(loggedContent, logger.getLogAsString())
     }
 
-    private fun getThrowableWithStackTrace(): Throwable? {
+    @Test
+    fun getLogAsString_swallowsExceptions() {
+        logger.inputStreamProvider = object : InputStreamProvider {
+            override fun provideInputStream(): InputStream? {
+                throw RuntimeException()
+                return null
+            }
+        }
+        logger.getLogAsString()
+    }
+
+    private fun getThrowableWithStackTrace(): Throwable {
         try {
             1 / 0
         } catch (t: Throwable) {
             return t
         }
-        return null
+        return null!!
     }
 }

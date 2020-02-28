@@ -86,7 +86,9 @@ class StreamLogger(
         }
     }.getOrNull().orEmpty()
 
-    fun wipeLog() = clearFunction?.invoke()
+    fun wipeLog() = runCatching {
+        clearFunction?.invoke()
+    }
 
     internal fun entryFor(
             priority: Int,
