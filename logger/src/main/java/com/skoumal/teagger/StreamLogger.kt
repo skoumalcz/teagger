@@ -26,18 +26,14 @@ class StreamLogger(
      * @param throwable
      */
     fun log(priority: Int, tag: String, message: String?, throwable: Throwable?) {
-        runCatching {
-            val outputStream = outputStreamProvider?.provideOutputStream() ?: return@runCatching
-            PrintStream(outputStream).use { stream ->
-                stream.print(entryFor(priority, tag, message))
-                runCatching {
-                    throwable?.let {
-                        stream.print(" ")
-                        throwable.printStackTrace(stream)
-                    }
-                }
-                stream.println()
+        val outputStream = outputStreamProvider?.provideOutputStream() ?: return
+        PrintStream(outputStream).use { stream ->
+            stream.print(entryFor(priority, tag, message))
+            throwable?.let {
+                stream.print(" ")
+                throwable.printStackTrace(stream)
             }
+            stream.println()
         }
     }
 
@@ -78,13 +74,18 @@ class StreamLogger(
         context.startActivity(shareIntent)
     }
 
-    fun getLogAsString() = runCatching {
-        inputStreamProvider?.provideInputStream()?.bufferedReader()?.use {
-            it.readText()
+    fun getLogAsString(): String {
+        try {
+            return inputStreamProvider?.provideInputStream()?.bufferedReader()?.use {
+                it.readText()
+            }.orEmpty()
+        } catch (e: IOException) {
+            e.printStackTrace()
         }
-    }.getOrNull().orEmpty()
+        return ""
+    }
 
-    fun wipeLog() = runCatching {
+    fun wipeLog() {
         clearFunction?.invoke()
     }
 
@@ -106,17 +107,26 @@ class StreamLogger(
         return "$priorityString/$tag: ${message.orEmpty()}"
     }
 
-    internal fun getFileForSharing(context: Context) = runCatching {
+    internal fun getFileForSharing(context: Context): File? {
         val string = getLogAsString()
-        val dir = File(context.cacheDir, CACHE_DIR).apply {
-            mkdirs()
-        }
-        File(dir, CACHE_SHARED_FILE).apply {
-            delete()
-            createNewFile()
-            outputStream().bufferedWriter().use {
-                it.write(string)
+        try {
+            val dir = File(context.cacheDir, CACHE_DIR).apply {
+                mkdirs()
+            }
+            return File(dir, CACHE_SHARED_FILE).apply {
+                delete()
+                createNewFile()
+                outputStream().bufferedWriter().use {
+                    it.write(string)
+                }
+            }
+        } catch (e: Exception) {
+            if (e is SecurityException || e is IOException || e is FileNotFoundException) {
+                e.printStackTrace()
+            } else {
+                throw e
             }
         }
-    }.getOrNull()
+        return null
+    }
 }

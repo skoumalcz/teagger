@@ -60,20 +60,6 @@ class StreamLoggerTest {
     }
 
     @Test
-    fun log_swallowsExceptions() {
-        logger.outputStreamProvider = object : OutputStreamProvider {
-            override fun provideOutputStream() = object : ByteArrayOutputStream() {
-                override fun close() {
-                    super.close()
-                    throw RuntimeException()
-                }
-            }
-        }
-
-        logger.log(Log.VERBOSE, "tag", "message", null)
-    }
-
-    @Test
     fun logFunctions_appendCorrectEntries() {
         val tag = "Tag"
 
@@ -133,28 +119,9 @@ class StreamLoggerTest {
     }
 
     @Test
-    fun wipeLog_swallowsExceptions() {
-        logger.clearFunction = {
-            throw RuntimeException()
-        }
-        logger.wipeLog()
-    }
-
-    @Test
     fun getLogAsString_returnsFullLog() {
         loggedContent = "logged content"
         assertEquals(loggedContent, logger.getLogAsString())
-    }
-
-    @Test
-    fun getLogAsString_swallowsExceptions() {
-        logger.inputStreamProvider = object : InputStreamProvider {
-            override fun provideInputStream(): InputStream? {
-                throw RuntimeException()
-                return null
-            }
-        }
-        logger.getLogAsString()
     }
 
     private fun getThrowableWithStackTrace(): Throwable {
