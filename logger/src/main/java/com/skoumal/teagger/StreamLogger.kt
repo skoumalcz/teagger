@@ -8,12 +8,10 @@ import androidx.core.content.FileProvider
 import java.io.*
 
 class StreamLogger(
-        var outputStreamProvider: OutputStreamProvider?,
-        var inputStreamProvider: InputStreamProvider?,
-        var clearFunction: (() -> Unit)?
+        var outputStreamProvider: OutputStreamProvider? = null,
+        var inputStreamProvider: InputStreamProvider? = null,
+        var clearFunction: (() -> Unit)? = null
 ) {
-
-    constructor() : this(null, null, null)
 
     companion object {
         private const val CACHE_DIR = "teagger/"
@@ -110,14 +108,15 @@ class StreamLogger(
 
     internal fun getFileForSharing(context: Context) = runCatching {
         val string = getLogAsString()
-        val dir = File(context.cacheDir, CACHE_DIR)
-        dir.mkdirs()
-        val file = File(dir, CACHE_SHARED_FILE)
-        file.delete()
-        file.createNewFile()
-        file.outputStream().bufferedWriter().use {
-            it.write(string)
+        val dir = File(context.cacheDir, CACHE_DIR).apply {
+            mkdirs()
         }
-        file
+        File(dir, CACHE_SHARED_FILE).apply {
+            delete()
+            createNewFile()
+            outputStream().bufferedWriter().use {
+                it.write(string)
+            }
+        }
     }.getOrNull()
 }
