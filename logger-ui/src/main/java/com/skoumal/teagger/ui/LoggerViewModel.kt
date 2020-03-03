@@ -13,7 +13,12 @@ import com.skoumal.teanity.viewevent.base.ViewEvent
 import com.skoumal.teanity.viewmodel.TeanityViewModel
 import kotlinx.coroutines.launch
 
-class LoggerViewModel(private val streamLogger: StreamLogger) : TeanityViewModel() {
+/**
+ * @param streamLogger The [StreamLogger] which has been used for logging
+ * @param authority The [androidx.core.content.FileProvider] authority which has access to the teagger/ directory in cache
+ */
+class LoggerViewModel(private val streamLogger: StreamLogger, private val authority: String) :
+        TeanityViewModel() {
 
     val binding = bindingOf<LogLineItem> { }
     val items = ObservableArrayList<LogLineItem>()
@@ -27,7 +32,7 @@ class LoggerViewModel(private val streamLogger: StreamLogger) : TeanityViewModel
     }
 
     fun sendLog() {
-        SendLogEvent(streamLogger).publish()
+        SendLogEvent(streamLogger, authority).publish()
     }
 
     fun wipeLog() {
@@ -35,9 +40,11 @@ class LoggerViewModel(private val streamLogger: StreamLogger) : TeanityViewModel
         FinishActivityEvent.publish()
     }
 
-    class SendLogEvent(private val streamLogger: StreamLogger) : ViewEvent(), ContextExecutor {
+    class SendLogEvent(private val streamLogger: StreamLogger, private val authority: String) :
+            ViewEvent(), ContextExecutor {
+
         override fun invoke(context: Context) {
-            streamLogger.shareLog(context, "com.teagger.fileprovider")
+            streamLogger.shareLog(context, authority)
         }
     }
 
