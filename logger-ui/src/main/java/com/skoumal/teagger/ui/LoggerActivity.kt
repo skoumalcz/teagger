@@ -9,4 +9,9 @@ abstract class LoggerActivity : TeanityActivity<LoggerViewModel, ActivityLoggerB
     abstract override val viewModel: LoggerViewModel
 
     abstract val streamLogger: StreamLogger
+
+    override fun onDestroy() {
+        super.onDestroy()
+        viewModel.refreshJob.cancel()
+    }
 }

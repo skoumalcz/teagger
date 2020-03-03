@@ -2,15 +2,18 @@ package com.skoumal.teagger.ui
 
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
-import androidx.databinding.ObservableArrayList
 import com.skoumal.teagger.StreamLogger
 import com.skoumal.teanity.databinding.GenericRvItem
 import com.skoumal.teanity.extensions.bindingOf
 import com.skoumal.teanity.extensions.compareToSafe
+import com.skoumal.teanity.extensions.diffListOf
 import com.skoumal.teanity.viewevent.base.ActivityExecutor
 import com.skoumal.teanity.viewevent.base.ContextExecutor
 import com.skoumal.teanity.viewevent.base.ViewEvent
 import com.skoumal.teanity.viewmodel.TeanityViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 /**
@@ -21,13 +24,22 @@ class LoggerViewModel(private val streamLogger: StreamLogger, private val author
         TeanityViewModel() {
 
     val binding = bindingOf<LogLineItem> { }
-    val items = ObservableArrayList<LogLineItem>()
+    val items = diffListOf<LogLineItem>()
+
+    val refreshJob: Job
 
     init {
-        launch {
-            streamLogger.getLogAsString().split('\n').forEach {
-                items += LogLineItem(it)
+        refreshJob = launch {
+            while (isActive) {
+                refreshLog()
+                delay(4000)
             }
+        }
+    }
+
+    private fun refreshLog() = synchronized(this) {
+        streamLogger.getLogAsString().split('\n').map { LogLineItem(it) }.let {
+            items.updateAsync(it)
         }
     }
 
