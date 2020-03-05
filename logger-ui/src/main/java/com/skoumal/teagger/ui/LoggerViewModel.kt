@@ -3,6 +3,7 @@ package com.skoumal.teagger.ui
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import com.skoumal.teagger.StreamLogger
+import com.skoumal.teagger.shareLog
 import com.skoumal.teanity.databinding.GenericRvItem
 import com.skoumal.teanity.extensions.bindingOf
 import com.skoumal.teanity.extensions.compareToSafe
@@ -11,10 +12,7 @@ import com.skoumal.teanity.viewevent.base.ActivityExecutor
 import com.skoumal.teanity.viewevent.base.ContextExecutor
 import com.skoumal.teanity.viewevent.base.ViewEvent
 import com.skoumal.teanity.viewmodel.TeanityViewModel
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 /**
  * @param streamLogger The [StreamLogger] which has been used for logging
@@ -37,14 +35,14 @@ class LoggerViewModel(private val streamLogger: StreamLogger, private val author
         }
     }
 
-    private fun refreshLog() = synchronized(this) {
+    private fun refreshLog() = launch {
         streamLogger.getLogAsString().split('\n').map { LogLineItem(it) }.let {
             items.updateAsync(it)
         }
     }
 
     fun sendLog() {
-        SendLogEvent(streamLogger, authority).publish()
+        SendLogEvent(streamLogger, authority, this).publish()
     }
 
     fun wipeLog() {
@@ -52,11 +50,14 @@ class LoggerViewModel(private val streamLogger: StreamLogger, private val author
         FinishActivityEvent.publish()
     }
 
-    class SendLogEvent(private val streamLogger: StreamLogger, private val authority: String) :
-            ViewEvent(), ContextExecutor {
+    class SendLogEvent(
+            private val streamLogger: StreamLogger,
+            private val authority: String,
+            private val scope: CoroutineScope
+    ) : ViewEvent(), ContextExecutor {
 
         override fun invoke(context: Context) {
-            streamLogger.shareLog(context, authority)
+            streamLogger.shareLog(scope, context, authority)
         }
     }
 
