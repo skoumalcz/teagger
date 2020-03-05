@@ -1,6 +1,8 @@
 package com.skoumal.teagger
 
-class StreamLoggerSyncTest : StreamLoggerTest() {
+import com.skoumal.teagger.base.StreamLoggerBaseTest
+
+class StreamLoggerSyncTest : StreamLoggerBaseTest() {
     override fun createLogger(
             outputProvider: OutputStreamProvider,
             inputProvider: InputStreamProvider,
@@ -9,4 +11,13 @@ class StreamLoggerSyncTest : StreamLoggerTest() {
 
     override fun getLogEntryDelegate(streamLogger: StreamLogger) =
             streamLogger as StreamLoggerSync
+
+    override fun testLogMethod(
+            logger: StreamLogger,
+            logBlock: () -> Unit,
+            assertBlock: () -> Unit
+    ) {
+        logBlock()
+        assertBlock()
+    }
 }

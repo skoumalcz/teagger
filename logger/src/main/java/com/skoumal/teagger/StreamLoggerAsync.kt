@@ -13,7 +13,7 @@ class StreamLoggerAsync(
 ) : StreamLogger, LogEntryDelegate by logEntryDelegate, CoroutineScope by coroutineScope {
 
     @UseExperimental(ObsoleteCoroutinesApi::class)
-    private val singleThreadContext = newSingleThreadContext("LoggerOutputContext")
+    internal val singleThreadContext = newSingleThreadContext("LoggerOutputContext")
 
     /**
      * Adds an entry into the log file
