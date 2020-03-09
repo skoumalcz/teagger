@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
 import java.util.*
 import kotlin.IllegalArgumentException
@@ -12,6 +13,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        setContentView(R.layout.activity_main)
 
         for (i in 0 until 100) {
             MyApplication.streamLogger.log(Log.DEBUG, "MainActivity", "message $i", null)
@@ -29,6 +32,9 @@ class MainActivity : AppCompatActivity() {
             Log.d("logger", s.nextLine())
         }
 
-        startActivity(Intent(this, MyLoggerActivity::class.java))
+        main_crash.setOnClickListener { 0 / 0 }
+        main_share.setOnClickListener {
+            startActivity(Intent(this, MyLoggerActivity::class.java))
+        }
     }
 }

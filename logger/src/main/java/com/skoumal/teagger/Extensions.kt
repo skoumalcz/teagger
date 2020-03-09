@@ -10,11 +10,6 @@ import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
 
-object Sharing {
-    internal const val CACHE_DIR = "teagger/"
-    internal const val CACHE_SHARED_FILE = "sharedlog.txt"
-}
-
 fun StreamLogger.setFile(file: File) {
     val fileProvider = FileProvider(file)
     inputStreamProvider = fileProvider
@@ -25,10 +20,10 @@ fun StreamLogger.setFile(file: File) {
 suspend fun StreamLogger.getFileForSharing(context: Context): File? {
     val string = getLogAsString()
     try {
-        val dir = File(context.cacheDir, Sharing.CACHE_DIR).apply {
+        val dir = File(context.cacheDir, Constants.CACHE_DIR).apply {
             mkdirs()
         }
-        return File(dir, Sharing.CACHE_SHARED_FILE).apply {
+        return File(dir, Constants.CACHE_SHARED_FILE).apply {
             delete()
             createNewFile()
             outputStream().bufferedWriter().use {

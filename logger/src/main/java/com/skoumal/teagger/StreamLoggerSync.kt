@@ -18,9 +18,20 @@ class StreamLoggerSync(
      * @param throwable the stacktrace of this will be printed to the log
      */
     override fun log(priority: Int, tag: String, message: String?, throwable: Throwable?) {
+        log(entryFor(priority, tag, message), throwable)
+    }
+
+    /**
+     * Adds an entry into the log file in your own format. Note: You can also pass your
+     * own [LogEntryDelegate] to format your log entries
+     * @param line what you would like to be logged, including your priority / tag / whatever,
+     *      as you would like it to be formatted
+     * @param throwable the stacktrace of this will be printed to the log
+     */
+    override fun log(line: String, throwable: Throwable?) {
         val outputStream = outputStreamProvider?.provideOutputStream() ?: return
         PrintStream(outputStream).use { stream ->
-            stream.print(entryFor(priority, tag, message))
+            stream.print(line)
             throwable?.let {
                 stream.print(" ")
                 throwable.printStackTrace(stream)
