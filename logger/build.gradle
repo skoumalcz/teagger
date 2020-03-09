@@ -22,6 +22,7 @@ dependencies {
 
     implementation(Lib.kotlin.lib)
     implementation(Lib.kotlin.coroutines)
+    implementation(Lib.kotlin.coroutinesTest)
 
     /* === SUPPORT === */
     api(Lib.androidx.appcompat)
