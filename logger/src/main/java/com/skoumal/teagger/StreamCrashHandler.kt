@@ -5,21 +5,21 @@ import kotlinx.coroutines.launch
 import java.io.File
 import java.io.IOException
 
-class StreamCrashHandler(val logger: StreamLogger, context: Context) {
+class StreamCrashHandler internal constructor(
+        var logger: StreamLogger,
+        internal var fileLogger: StreamLoggerAsync = StreamLoggerAsync()
+) {
 
-    private val loggerSync: StreamLoggerSync
+    internal val loggerSync: StreamLoggerSync
         get() = if (logger is StreamLoggerSync)
-            logger
+            logger as StreamLoggerSync
         else
             logger.copyIntoSync()
 
-
-    private val fileLogger = StreamLoggerAsync()
-    private val fileLoggerSync: StreamLoggerSync
+    internal val fileLoggerSync: StreamLoggerSync
         get() = fileLogger.copyIntoSync()
 
-
-    init {
+    constructor(logger: StreamLogger, context: Context): this(logger) {
         try {
             val dir = File(context.filesDir, Constants.FILES_DIR).apply { mkdirs() }
             val file = File(dir, Constants.CRASH_LOG_FILE).apply { createNewFile() }

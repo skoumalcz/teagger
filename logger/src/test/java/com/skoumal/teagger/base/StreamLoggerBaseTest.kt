@@ -44,7 +44,6 @@ abstract class StreamLoggerBaseTest {
                     loggedContent += this.toString()
                 }
             }
-
         }
 
         inputStreamProvider = object : InputStreamProvider {
@@ -69,7 +68,6 @@ abstract class StreamLoggerBaseTest {
         val entry2 = logEntryDelegate.entryFor(Log.WARN, tag, message2)
         val throwable = getThrowableWithStackTrace()
         val exceptionName = throwable::class.java.name
-
 
         val logBlock = {
             logger.log(Log.DEBUG, tag, message1, null)
@@ -141,14 +139,5 @@ abstract class StreamLoggerBaseTest {
             logger.getLogAsString()
         }
         assertEquals(loggedContent, result)
-    }
-
-    private fun getThrowableWithStackTrace(): Throwable {
-        try {
-            1 / 0
-        } catch (t: Throwable) {
-            return t
-        }
-        return null!!
     }
 }
