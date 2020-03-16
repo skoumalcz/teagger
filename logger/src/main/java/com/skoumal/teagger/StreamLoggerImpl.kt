@@ -15,6 +15,7 @@ import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.channels.Channel.Factory.BUFFERED
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.consumeAsFlow
+import timber.log.Timber
 import java.io.File
 import java.io.PrintStream
 import java.io.PrintWriter
@@ -39,6 +40,7 @@ internal class StreamLoggerImpl(
 
     init {
         StreamCrashHandler(this)
+        launch { drainFatal() }
     }
 
     override fun log(
@@ -126,6 +128,29 @@ internal class StreamLoggerImpl(
                 channel = null
             }
             channel
+        }
+    }
+
+    /**
+     * Drains fatal file to the regular crash file provided during object init. Once this process
+     * succeeds, the fatal file is deleted with all of it's contents trusted in the hands of the
+     * host app's implementation.
+     *
+     * This is the only thing that *MUST NOT* crash under any circumstances. This will undoubtfully
+     * crash the host app during Application init, and we cannot possibly allow that.
+     * */
+    private suspend fun drainFatal() = withContext(Dispatchers.IO) {
+        runCatching {
+            PrintStream(outputStream.provideOutputStream()).use { output ->
+                Constants.fatalFile.inputStream().use { input ->
+                    input.bufferedReader().forEachLine {
+                        output.appendln(it)
+                    }
+                }
+            }
+            Constants.fatalFile.deleteRecursively()
+        }.onFailure {
+            Timber.e("Draining fatal error resulted in error. Both streams must be accessible!")
         }
     }
 
