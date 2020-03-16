@@ -2,43 +2,9 @@ package com.skoumal.teagger
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.util.Log
-import androidx.core.content.FileProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.io.File
-import java.io.FileNotFoundException
-import java.io.IOException
-
-@Deprecated("Init providers directly")
-fun StreamLogger.setFile(file: File) {
-    val fileProvider = com.skoumal.teagger.provider.file.FileProvider(file)
-    TODO("Init providers directly")
-    //inputStreamProvider = fileProvider
-    //outputStreamProvider = fileProvider
-    //clearFunction = fileProvider.provideCleanFunction()
-}
-
-suspend fun StreamLogger.getFileForSharing(context: Context): File? = withContext(Dispatchers.IO) {
-    val string = collect()
-    runCatching {
-        val dir = File(context.cacheDir, Constants.CACHE_DIR).apply {
-            mkdirs()
-        }
-        return@withContext File(dir, Constants.CACHE_SHARED_FILE).apply {
-            writeText(string)
-        }
-    }.onFailure {
-        when (it) {
-            is SecurityException,
-            is IOException,
-            is FileNotFoundException -> it.printStackTrace()
-            else -> throw it
-        }
-    }
-    return@withContext null
-}
 
 /**
  * Opens a share activity for a log file.
@@ -50,14 +16,9 @@ suspend fun StreamLogger.shareLog(
     context: Context,
     authority: String
 ) = withContext(Dispatchers.Main) {
-    val file = withContext(Dispatchers.IO) {
-        getFileForSharing(context)
-    } ?: return@withContext
-
-    val contentUri: Uri = FileProvider.getUriForFile(context, authority, file)
     val sendIntent: Intent = Intent().apply {
         action = Intent.ACTION_SEND
-        putExtra(Intent.EXTRA_STREAM, contentUri)
+        putExtra(Intent.EXTRA_STREAM, collect(context, authority))
         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         type = "text/plain"
     }
@@ -82,3 +43,12 @@ fun StreamLogger.e(tag: String, message: String?, throwable: Throwable?) =
 
 fun StreamLogger.wtf(tag: String, message: String?, throwable: Throwable?) =
     log(Log.ASSERT, tag, message, throwable)
+
+private fun StreamLogger.log(priority: Int, tag: String, message: String?, throwable: Throwable?) {
+    if (message != null) {
+        log(priority, tag, message)
+    }
+    if (throwable != null) {
+        log(throwable)
+    }
+}

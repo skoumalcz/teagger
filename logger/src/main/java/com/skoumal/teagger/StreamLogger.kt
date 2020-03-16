@@ -1,12 +1,14 @@
 package com.skoumal.teagger
 
 import android.content.Context
+import android.net.Uri
 import com.skoumal.teagger.entry.LogEntryDelegate
 import com.skoumal.teagger.provider.CleanupProvider
 import com.skoumal.teagger.provider.InputStreamProvider
 import com.skoumal.teagger.provider.OutputStreamProvider
 import com.skoumal.teagger.provider.file.FileProvider
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import java.io.File
 import java.lang.ref.WeakReference
 
@@ -22,8 +24,9 @@ interface StreamLogger {
      * Fetching log is virtually impossible to achieve with anything but IO work, hence it always
      * runs on [Dispatchers.IO].
      * */
-    @Deprecated("Will be replaced by collect(Context): File and observe()")
-    suspend fun collect(): String
+    suspend fun collect(context: Context, authority: Int): Uri
+    suspend fun collect(context: Context, authority: String): Uri
+    suspend fun observe(): Flow<String>
     suspend fun clear(): Boolean
 
     companion object {
