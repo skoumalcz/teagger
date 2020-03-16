@@ -1,5 +1,7 @@
 package com.skoumal.teagger
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.io.PrintStream
 
@@ -40,15 +42,17 @@ class StreamLoggerSync(
         }
     }
 
-    override suspend fun getLogAsString(): String {
+    override suspend fun getLogAsString(): String = withContext(Dispatchers.IO) {
         try {
-            return inputStreamProvider?.provideInputStream()?.bufferedReader()?.use {
-                it.readText()
-            }.orEmpty()
+            return@withContext inputStreamProvider
+                ?.provideInputStream()
+                ?.bufferedReader()
+                ?.use { it.readText() }
+                .orEmpty()
         } catch (e: IOException) {
             e.printStackTrace()
         }
-        return ""
+        return@withContext ""
     }
 
     override fun wipeLog() {

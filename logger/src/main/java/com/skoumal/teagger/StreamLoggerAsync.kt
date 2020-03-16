@@ -87,13 +87,15 @@ class StreamLoggerAsync(
 
     override suspend fun getLogAsString(): String = withContext(Dispatchers.IO) {
         try {
-            return@withContext inputStreamProvider?.provideInputStream()?.bufferedReader()?.use {
-                it.readText()
-            }.orEmpty()
+            return@withContext inputStreamProvider
+                ?.provideInputStream()
+                ?.bufferedReader()
+                ?.use { it.readText() }
+                .orEmpty()
         } catch (e: IOException) {
             e.printStackTrace()
         }
-        ""
+        return@withContext ""
     }
 
     override fun wipeLog() {
