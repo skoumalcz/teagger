@@ -1,12 +1,13 @@
 package com.skoumal.teagger.provider.file
 
+import com.skoumal.teagger.Constants
 import com.skoumal.teagger.provider.CleanupProvider
 import com.skoumal.teagger.provider.InputStreamProvider
 import com.skoumal.teagger.provider.OutputStreamProvider
 import java.io.File
 
 class FileProvider(
-    private val file: File
+    private val file: File = Constants.crashFile
 ) : CleanupProvider,
     OutputStreamProvider by FileOutputStreamProvider(file),
     InputStreamProvider by FileInputStreamProvider(file) {

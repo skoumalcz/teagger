@@ -2,6 +2,9 @@ package com.skoumal.teagger
 
 import android.content.Context
 import com.skoumal.teagger.entry.LogEntryDelegate
+import com.skoumal.teagger.provider.CleanupProvider
+import com.skoumal.teagger.provider.InputStreamProvider
+import com.skoumal.teagger.provider.OutputStreamProvider
 import com.skoumal.teagger.provider.file.FileProvider
 import kotlinx.coroutines.Dispatchers
 import java.io.File
@@ -33,6 +36,25 @@ interface StreamLogger {
         operator fun invoke(context: Context, file: File): StreamLogger {
             _context = WeakReference(context.applicationContext)
             return StreamLoggerImpl(FileProvider(file))
+        }
+
+        @JvmStatic
+        @JvmName("withContext")
+        operator fun invoke(context: Context): StreamLogger {
+            _context = WeakReference(context.applicationContext)
+            return StreamLoggerImpl(FileProvider())
+        }
+
+        @JvmStatic
+        @JvmName("withProviders")
+        operator fun invoke(
+            context: Context,
+            inputStream: InputStreamProvider,
+            outputStream: OutputStreamProvider,
+            cleanup: CleanupProvider? = null
+        ): StreamLogger {
+            _context = WeakReference(context.applicationContext)
+            return StreamLoggerImpl(inputStream, outputStream, cleanup)
         }
 
     }
