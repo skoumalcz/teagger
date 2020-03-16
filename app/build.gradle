@@ -23,21 +23,6 @@ android {
         enabled true
     }
 
-    signingConfigs {
-        debug {
-            storeFile file("keystore.jks")
-            storePassword "debugdebug"
-            keyAlias "debug"
-            keyPassword "debugdebug"
-        }
-    }
-
-    buildTypes {
-        debug {
-            signingConfig signingConfigs.debug
-        }
-    }
-
 }
 
 teanity {
