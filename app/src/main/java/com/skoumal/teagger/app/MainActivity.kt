@@ -7,7 +7,6 @@ import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
 import java.util.*
-import kotlin.IllegalArgumentException
 
 class MainActivity : AppCompatActivity() {
 
@@ -17,13 +16,13 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         for (i in 0 until 100) {
-            MyApplication.streamLogger.log(Log.DEBUG, "MainActivity", "message $i", null)
+            MyApplication.streamLogger.log(Log.DEBUG, "MainActivity", "message $i")
         }
 
         try {
             throw IllegalArgumentException("test")
         } catch (e: IllegalArgumentException) {
-            MyApplication.streamLogger.log(Log.ERROR, "MainActivity", null, e)
+            MyApplication.streamLogger.log(e)
         }
 
         val f = File(filesDir, "teaggerlog")

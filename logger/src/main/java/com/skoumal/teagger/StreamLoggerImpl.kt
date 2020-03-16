@@ -11,14 +11,17 @@ import com.skoumal.teagger.provider.OutputStreamProvider
 import com.skoumal.teagger.provider.file.FileProvider
 import com.skoumal.teagger.provider.provideOrDefault
 import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.BroadcastChannel
+import kotlinx.coroutines.channels.Channel.Factory.BUFFERED
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.consumeAsFlow
+import java.io.File
 import java.io.PrintStream
 import java.io.PrintWriter
 import java.io.StringWriter
 import androidx.core.content.FileProvider as AndroidFileProvider
 
+@UseExperimental(ExperimentalCoroutinesApi::class, FlowPreview::class)
 internal class StreamLoggerImpl(
     private val inputStream: InputStreamProvider,
     private val outputStream: OutputStreamProvider,
@@ -30,7 +33,7 @@ internal class StreamLoggerImpl(
     override var entryTransformer: LogEntryDelegate = LogEntryDelegate.default
 
     @Volatile
-    private var channel: Channel<String>? = null
+    private var channel: BroadcastChannel<String>? = null
 
     init {
         StreamCrashHandler(this)
@@ -52,15 +55,13 @@ internal class StreamLoggerImpl(
         }
     }
 
-    @Synchronized
     private suspend fun logInternal(line: String) = withContext(Dispatchers.IO) {
         PrintStream(outputStream.provideOrDefault()).use { stream ->
             stream.println(line)
         }
-        getChannelForSend()?.send(line)
+        getChannelForSend()?.offer(line)
     }
 
-    @Synchronized
     private suspend fun logInternal(
         line: String,
         throwable: Throwable
@@ -81,6 +82,17 @@ internal class StreamLoggerImpl(
         }
     }
 
+    override suspend fun collect(): File = withContext(Dispatchers.IO) {
+        Constants.shareFile.also {
+            it.writeText("")
+            inputStream.provideInputStream().use { input ->
+                it.outputStream().use { output ->
+                    input.copyTo(output)
+                }
+            }
+        }
+    }
+
     override suspend fun collect(context: Context, authority: Int): Uri {
         return collect(context, context.getString(authority))
     }
@@ -88,23 +100,11 @@ internal class StreamLoggerImpl(
     override suspend fun collect(
         context: Context,
         authority: String
-    ): Uri = withContext(Dispatchers.IO) {
-        val sharableFile = Constants.shareFile
-        inputStream.provideInputStream().use { input ->
-            sharableFile.outputStream().use { output ->
-                input.copyTo(output)
-            }
-        }
-        AndroidFileProvider.getUriForFile(context, authority, sharableFile)
-    }
+    ): Uri = AndroidFileProvider.getUriForFile(context, authority, collect())
 
-    @UseExperimental(FlowPreview::class)
     override suspend fun observe(): Flow<String> {
-        return getOrCreateChannel().consumeAsFlow().also {
-            inputStream.provideOrDefault().bufferedReader().useLines { lines ->
-                lines.forEach { getChannelForSend()?.offer(it) }
-            }
-        }
+        // fixme this is broken when trying to fill the sub with result of collect(), since client cannot consume more or same than the broadcast offers
+        return getOrCreateChannel().openSubscription().consumeAsFlow()
     }
 
     override suspend fun clear(): Boolean {
@@ -114,15 +114,16 @@ internal class StreamLoggerImpl(
     // Private members
 
     @Synchronized
-    private fun getOrCreateChannel() = channel ?: Channel<String>().also {
+    private fun getOrCreateChannel() = channel ?: BroadcastChannel<String>(BUFFERED).also {
         channel = it
     }
 
-    @UseExperimental(ExperimentalCoroutinesApi::class)
-    private fun getChannelForSend(): Channel<String>? {
+    private fun getChannelForSend(): BroadcastChannel<String>? {
         return channel?.let {
-            if (it.isClosedForSend) channel = null
-            getOrCreateChannel()
+            if (it.isClosedForSend) {
+                channel = null
+            }
+            channel
         }
     }
 

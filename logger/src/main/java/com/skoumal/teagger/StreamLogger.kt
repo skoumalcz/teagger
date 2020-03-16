@@ -7,7 +7,6 @@ import com.skoumal.teagger.provider.CleanupProvider
 import com.skoumal.teagger.provider.InputStreamProvider
 import com.skoumal.teagger.provider.OutputStreamProvider
 import com.skoumal.teagger.provider.file.FileProvider
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import java.io.File
 import java.lang.ref.WeakReference
@@ -20,10 +19,7 @@ interface StreamLogger {
     fun log(priority: Int, tag: String, message: String)
     fun log(throwable: Throwable)
 
-    /**
-     * Fetching log is virtually impossible to achieve with anything but IO work, hence it always
-     * runs on [Dispatchers.IO].
-     * */
+    suspend fun collect(): File
     suspend fun collect(context: Context, authority: Int): Uri
     suspend fun collect(context: Context, authority: String): Uri
     suspend fun observe(): Flow<String>

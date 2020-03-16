@@ -2,9 +2,7 @@ package com.skoumal.teagger.app
 
 import android.app.Application
 import com.skoumal.teagger.StreamLogger
-import com.skoumal.teagger.crash.StreamCrashHandler
-import com.skoumal.teagger.setFile
-import java.io.File
+import timber.log.Timber
 
 class MyApplication : Application() {
 
@@ -14,37 +12,7 @@ class MyApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        streamLogger = StreamLoggerAsync()
-
-        val file = File(filesDir, "teaggerlog")
-        file.createNewFile()
-
-        streamLogger.setFile(file)
-
-        val crashHandler =
-            StreamCrashHandler(streamLogger, this)
-        crashHandler.pushToLog()
-
-        /*val crashingLogger = StreamLoggerSync().apply {
-            outputStreamProvider = object : OutputStreamProvider {
-                override fun provideOutputStream(): OutputStream? {
-                    throw IllegalArgumentException()
-                }
-            }
-
-            inputStreamProvider = object : InputStreamProvider {
-                override fun provideInputStream(): InputStream? = "".byteInputStream()
-            }
-
-            clearFunction = {}
-         }
-
-        val crashingCrashHandler = StreamCrashHandler(crashingLogger, this)*/
-
-        val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
-        Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
-            crashHandler.handleCrash(throwable)
-            defaultHandler?.uncaughtException(thread, throwable)
-        }
+        Timber.plant(Timber.DebugTree())
+        streamLogger = StreamLogger(this)
     }
 }
