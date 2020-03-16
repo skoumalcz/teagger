@@ -5,9 +5,9 @@ import android.util.Log
 class LogEntryDelegateImpl : LogEntryDelegate {
 
     override fun entryFor(
-            priority: Int,
-            tag: String,
-            message: String?
+        priority: Int,
+        tag: String,
+        message: String?
     ): String {
         val priorityString = when (priority) {
             Log.ASSERT -> "A"

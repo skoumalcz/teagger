@@ -6,8 +6,8 @@ import java.io.File
 import java.io.IOException
 
 class StreamCrashHandler internal constructor(
-        var logger: StreamLogger,
-        internal var fileLogger: StreamLoggerAsync = StreamLoggerAsync()
+    var logger: StreamLogger,
+    internal var fileLogger: StreamLoggerAsync = StreamLoggerAsync()
 ) {
 
     internal val loggerSync: StreamLoggerSync
@@ -19,7 +19,7 @@ class StreamCrashHandler internal constructor(
     internal val fileLoggerSync: StreamLoggerSync
         get() = fileLogger.copyIntoSync()
 
-    constructor(logger: StreamLogger, context: Context): this(logger) {
+    constructor(logger: StreamLogger, context: Context) : this(logger) {
         try {
             val dir = File(context.filesDir, Constants.FILES_DIR).apply { mkdirs() }
             val file = File(dir, Constants.CRASH_LOG_FILE).apply { createNewFile() }
@@ -54,10 +54,10 @@ class StreamCrashHandler internal constructor(
     fun handleCrash(throwable: Throwable) {
         runCatching {
             loggerSync.log(
-                    Constants.CRASH_DEFAULT_PRIORITY,
-                    Constants.CRASH_DEFAULT_TAG,
-                    Constants.CRASH_DEFAULT_MESSAGE,
-                    throwable
+                Constants.CRASH_DEFAULT_PRIORITY,
+                Constants.CRASH_DEFAULT_TAG,
+                Constants.CRASH_DEFAULT_MESSAGE,
+                throwable
             )
         }.exceptionOrNull()?.let {
             logSeparately(throwable)
@@ -66,13 +66,13 @@ class StreamCrashHandler internal constructor(
 
     private fun logSeparately(throwable: Throwable) {
         fileLoggerSync.log(
-                Constants.CRASH_DEFAULT_PRIORITY,
-                Constants.CRASH_DEFAULT_TAG,
-                Constants.CRASH_DEFAULT_MESSAGE,
-                throwable
+            Constants.CRASH_DEFAULT_PRIORITY,
+            Constants.CRASH_DEFAULT_TAG,
+            Constants.CRASH_DEFAULT_MESSAGE,
+            throwable
         )
     }
 
     private fun StreamLogger.copyIntoSync() =
-            StreamLoggerSync(outputStreamProvider, inputStreamProvider, clearFunction)
+        StreamLoggerSync(outputStreamProvider, inputStreamProvider, clearFunction)
 }

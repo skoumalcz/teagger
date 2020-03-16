@@ -5,11 +5,11 @@ import java.io.IOException
 import java.io.PrintStream
 
 class StreamLoggerAsync(
-        override var outputStreamProvider: OutputStreamProvider? = null,
-        override var inputStreamProvider: InputStreamProvider? = null,
-        override var clearFunction: (() -> Unit)? = null,
-        logEntryDelegate: LogEntryDelegate = LogEntryDelegateImpl(),
-        coroutineScope: CoroutineScope = MainScope()
+    override var outputStreamProvider: OutputStreamProvider? = null,
+    override var inputStreamProvider: InputStreamProvider? = null,
+    override var clearFunction: (() -> Unit)? = null,
+    logEntryDelegate: LogEntryDelegate = LogEntryDelegateImpl(),
+    coroutineScope: CoroutineScope = MainScope()
 ) : StreamLogger, LogEntryDelegate by logEntryDelegate, CoroutineScope by coroutineScope {
 
     @UseExperimental(ObsoleteCoroutinesApi::class)
@@ -25,14 +25,12 @@ class StreamLoggerAsync(
      *      a failure
      */
     fun log(
-            priority: Int,
-            tag: String,
-            message: String?,
-            throwable: Throwable?,
-            onFinished: ((Throwable?) -> Unit)?
-    ) {
-        log(entryFor(priority, tag, message), throwable, onFinished)
-    }
+        priority: Int,
+        tag: String,
+        message: String?,
+        throwable: Throwable?,
+        onFinished: ((Throwable?) -> Unit)?
+    ) = log(entryFor(priority, tag, message), throwable, onFinished)
 
     /**
      * Adds an entry into the log file
@@ -41,9 +39,12 @@ class StreamLoggerAsync(
      * @param message what you would like to be logged
      * @param throwable the stacktrace of this will be printed to the log
      */
-    override fun log(priority: Int, tag: String, message: String?, throwable: Throwable?) {
-        log(priority, tag, message, throwable, null)
-    }
+    override fun log(
+        priority: Int,
+        tag: String,
+        message: String?,
+        throwable: Throwable?
+    ) = log(priority, tag, message, throwable, null)
 
     /**
      * Adds an entry into the log file in your own format. Note: You can also pass your
@@ -53,12 +54,16 @@ class StreamLoggerAsync(
      * @param throwable the stacktrace of this will be printed to the log
      * @param onFinished to be called after the logging has finished no matter if there was a failure
      */
-    fun log(line: String, throwable: Throwable?, onFinished: ((Throwable?) -> Unit)?) {
+    fun log(
+        line: String,
+        throwable: Throwable?,
+        onFinished: ((Throwable?) -> Unit)?
+    ) {
         launch {
             withContext(singleThreadContext) {
                 runCatching {
                     val outputStream = outputStreamProvider?.provideOutputStream()
-                            ?: return@runCatching
+                        ?: return@runCatching
                     PrintStream(outputStream).use { stream ->
                         stream.print(line)
                         throwable?.let {
@@ -68,7 +73,7 @@ class StreamLoggerAsync(
                         stream.println()
                     }
                 }
-            }.exceptionOrNull().let {
+            }.onFailure {
                 onFinished?.invoke(it)
             }
         }

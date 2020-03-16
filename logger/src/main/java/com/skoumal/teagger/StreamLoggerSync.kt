@@ -6,10 +6,10 @@ import java.io.IOException
 import java.io.PrintStream
 
 class StreamLoggerSync(
-        override var outputStreamProvider: OutputStreamProvider? = null,
-        override var inputStreamProvider: InputStreamProvider? = null,
-        override var clearFunction: (() -> Unit)? = null,
-        logEntryDelegate: LogEntryDelegate = LogEntryDelegateImpl()
+    override var outputStreamProvider: OutputStreamProvider? = null,
+    override var inputStreamProvider: InputStreamProvider? = null,
+    override var clearFunction: (() -> Unit)? = null,
+    logEntryDelegate: LogEntryDelegate = LogEntryDelegateImpl()
 ) : StreamLogger, LogEntryDelegate by logEntryDelegate {
 
     /**
@@ -19,9 +19,12 @@ class StreamLoggerSync(
      * @param message what you would like to be logged
      * @param throwable the stacktrace of this will be printed to the log
      */
-    override fun log(priority: Int, tag: String, message: String?, throwable: Throwable?) {
-        log(entryFor(priority, tag, message), throwable)
-    }
+    override fun log(
+        priority: Int,
+        tag: String,
+        message: String?,
+        throwable: Throwable?
+    ) = log(entryFor(priority, tag, message), throwable)
 
     /**
      * Adds an entry into the log file in your own format. Note: You can also pass your

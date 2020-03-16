@@ -18,8 +18,10 @@ import kotlinx.coroutines.*
  * @param streamLogger The [StreamLogger] which has been used for logging
  * @param authority The [androidx.core.content.FileProvider] authority which has access to the teagger/ directory in cache
  */
-class LoggerViewModel(private val streamLogger: StreamLogger, private val authority: String) :
-        TeanityViewModel() {
+class LoggerViewModel(
+    private val streamLogger: StreamLogger,
+    private val authority: String
+) : TeanityViewModel() {
 
     val binding = bindingOf<LogLineItem> { }
     val items = diffListOf<LogLineItem>()
@@ -51,13 +53,15 @@ class LoggerViewModel(private val streamLogger: StreamLogger, private val author
     }
 
     class SendLogEvent(
-            private val streamLogger: StreamLogger,
-            private val authority: String,
-            private val scope: CoroutineScope
+        private val streamLogger: StreamLogger,
+        private val authority: String,
+        private val scope: CoroutineScope
     ) : ViewEvent(), ContextExecutor {
 
         override fun invoke(context: Context) {
-            streamLogger.shareLog(scope, context, authority)
+            scope.launch {
+                streamLogger.shareLog(context, authority)
+            }
         }
     }
 
