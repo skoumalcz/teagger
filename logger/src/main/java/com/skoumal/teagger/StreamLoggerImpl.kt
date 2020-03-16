@@ -19,6 +19,7 @@ import java.io.File
 import java.io.PrintStream
 import java.io.PrintWriter
 import java.io.StringWriter
+import java.util.concurrent.Executors
 import androidx.core.content.FileProvider as AndroidFileProvider
 
 @UseExperimental(ExperimentalCoroutinesApi::class, FlowPreview::class)
@@ -28,12 +29,13 @@ internal class StreamLoggerImpl(
     private val cleanup: CleanupProvider? = null
 ) : StreamLogger, CoroutineScope by IOScope() {
 
-    constructor(provider: FileProvider) : this(provider, provider)
+    constructor(provider: FileProvider) : this(provider, provider, provider)
 
     override var entryTransformer: LogEntryDelegate = LogEntryDelegate.default
 
     @Volatile
     private var channel: BroadcastChannel<String>? = null
+    private val jobContext = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
 
     init {
         StreamCrashHandler(this)
@@ -44,13 +46,13 @@ internal class StreamLoggerImpl(
         tag: String,
         message: String
     ) {
-        launch {
+        launch(jobContext) {
             logInternal(entryTransformer.entryFor(priority, tag, message))
         }
     }
 
     override fun log(throwable: Throwable) {
-        launch {
+        launch(jobContext) {
             logInternal(entryTransformer.entryFor(throwable), throwable)
         }
     }
