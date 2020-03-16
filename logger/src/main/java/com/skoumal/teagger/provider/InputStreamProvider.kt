@@ -13,3 +13,10 @@ interface InputStreamProvider {
     fun provideInputStream(): InputStream
 
 }
+
+fun InputStreamProvider.provideOrDefault(
+    default: InputStreamLambdaProvider
+) = kotlin.runCatching { provideInputStream() }
+    .fold(onSuccess = { it }, onFailure = { default() })
+
+typealias InputStreamLambdaProvider = () -> InputStream

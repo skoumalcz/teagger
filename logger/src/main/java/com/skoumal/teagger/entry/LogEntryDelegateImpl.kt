@@ -1,14 +1,11 @@
 package com.skoumal.teagger.entry
 
 import android.util.Log
+import com.skoumal.teagger.Constants
 
-class LogEntryDelegateImpl : LogEntryDelegate {
+internal class LogEntryDelegateImpl : LogEntryDelegate {
 
-    override fun entryFor(
-        priority: Int,
-        tag: String,
-        message: String?
-    ): String {
+    override fun entryFor(priority: Int, tag: String, message: String): String {
         val priorityString = when (priority) {
             Log.ASSERT -> "A"
             Log.DEBUG -> "D"
@@ -19,6 +16,11 @@ class LogEntryDelegateImpl : LogEntryDelegate {
             else -> ""
         }
 
-        return "$priorityString/$tag: ${message.orEmpty()}"
+        return "$priorityString/$tag: ${message.ifBlank { "{Blank error message}" }}"
     }
+
+    override fun entryFor(throwable: Throwable): String {
+        return "E/${throwable.message ?: Constants.CRASH_DEFAULT_MESSAGE}"
+    }
+
 }

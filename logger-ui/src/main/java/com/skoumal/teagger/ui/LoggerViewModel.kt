@@ -38,7 +38,7 @@ class LoggerViewModel(
     }
 
     private fun refreshLog() = launch {
-        streamLogger.getLogAsString().split('\n').map { LogLineItem(it) }.let {
+        streamLogger.collect().split('\n').map { LogLineItem(it) }.let {
             items.updateAsync(it)
         }
     }
@@ -48,7 +48,7 @@ class LoggerViewModel(
     }
 
     fun wipeLog() {
-        streamLogger.wipeLog()
+        streamLogger.clear()
         FinishActivityEvent.publish()
     }
 

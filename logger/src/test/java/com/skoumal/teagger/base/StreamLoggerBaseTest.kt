@@ -131,7 +131,7 @@ abstract class StreamLoggerBaseTest {
     fun wipeLog_callsCallback() {
         loggedContent = "content to be wiped"
         testLogMethod(logger, {
-            logger.wipeLog()
+            logger.clear()
         }, {
             assertEquals("", loggedContent)
         })
@@ -141,7 +141,7 @@ abstract class StreamLoggerBaseTest {
     fun getLogAsString_returnsFullLog() {
         loggedContent = "logged content"
         val result = runBlocking {
-            logger.getLogAsString()
+            logger.collect()
         }
         assertEquals(loggedContent, result)
     }

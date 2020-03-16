@@ -1,6 +1,7 @@
 package com.skoumal.teagger
 
 import com.skoumal.teagger.base.getThrowableWithStackTrace
+import com.skoumal.teagger.crash.StreamCrashHandler
 import com.skoumal.teagger.provider.InputStreamProvider
 import com.skoumal.teagger.provider.OutputStreamProvider
 import kotlinx.coroutines.Dispatchers
@@ -84,7 +85,10 @@ class StreamCrashHandlerTest {
                 fileClearCallback
         )
 
-        crashHandler = StreamCrashHandler(primaryLogger, fileLogger)
+        crashHandler = StreamCrashHandler(
+            primaryLogger,
+            fileLogger
+        )
         Dispatchers.setMain(TestCoroutineDispatcher())
     }
 

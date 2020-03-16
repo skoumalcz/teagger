@@ -1,7 +1,9 @@
 package com.skoumal.teagger.app
 
 import android.app.Application
-import com.skoumal.teagger.*
+import com.skoumal.teagger.StreamLogger
+import com.skoumal.teagger.crash.StreamCrashHandler
+import com.skoumal.teagger.setFile
 import java.io.File
 
 class MyApplication : Application() {
@@ -19,7 +21,8 @@ class MyApplication : Application() {
 
         streamLogger.setFile(file)
 
-        val crashHandler = StreamCrashHandler(streamLogger, this)
+        val crashHandler =
+            StreamCrashHandler(streamLogger, this)
         crashHandler.pushToLog()
 
         /*val crashingLogger = StreamLoggerSync().apply {

@@ -21,7 +21,7 @@ fun StreamLogger.setFile(file: File) {
 }
 
 suspend fun StreamLogger.getFileForSharing(context: Context): File? = withContext(Dispatchers.IO) {
-    val string = getLogAsString()
+    val string = collect()
     runCatching {
         val dir = File(context.cacheDir, Constants.CACHE_DIR).apply {
             mkdirs()
