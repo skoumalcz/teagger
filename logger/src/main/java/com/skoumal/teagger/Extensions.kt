@@ -11,11 +11,13 @@ import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
 
+@Deprecated("Init providers directly")
 fun StreamLogger.setFile(file: File) {
-    val fileProvider = FileProvider(file)
-    inputStreamProvider = fileProvider
-    outputStreamProvider = fileProvider
-    clearFunction = fileProvider.provideCleanFunction()
+    val fileProvider = com.skoumal.teagger.provider.file.FileProvider(file)
+    TODO("Init providers directly")
+    //inputStreamProvider = fileProvider
+    //outputStreamProvider = fileProvider
+    //clearFunction = fileProvider.provideCleanFunction()
 }
 
 suspend fun StreamLogger.getFileForSharing(context: Context): File? = withContext(Dispatchers.IO) {

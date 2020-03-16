@@ -1,13 +1,15 @@
 package com.skoumal.teagger
 
 import com.skoumal.teagger.base.StreamLoggerBaseTest
+import com.skoumal.teagger.provider.InputStreamProvider
+import com.skoumal.teagger.provider.OutputStreamProvider
 import kotlinx.coroutines.runBlocking
 
 class StreamLoggerAsyncTest : StreamLoggerBaseTest() {
     override fun createLogger(
-            outputProvider: OutputStreamProvider,
-            inputProvider: InputStreamProvider,
-            clearCallback: () -> Unit
+        outputProvider: OutputStreamProvider,
+        inputProvider: InputStreamProvider,
+        clearCallback: () -> Unit
     ) = StreamLoggerAsync(outputProvider, inputProvider, clearCallback)
 
     override fun getLogEntryDelegate(streamLogger: StreamLogger) =

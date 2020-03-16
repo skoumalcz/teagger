@@ -1,13 +1,18 @@
 package com.skoumal.teagger
 
+import com.skoumal.teagger.entry.LogEntryDelegate
+import com.skoumal.teagger.entry.LogEntryDelegateImpl
+import com.skoumal.teagger.provider.CleanupProvider
+import com.skoumal.teagger.provider.InputStreamProvider
+import com.skoumal.teagger.provider.OutputStreamProvider
 import kotlinx.coroutines.*
 import java.io.IOException
 import java.io.PrintStream
 
 class StreamLoggerAsync(
-    override var outputStreamProvider: OutputStreamProvider? = null,
-    override var inputStreamProvider: InputStreamProvider? = null,
-    override var clearFunction: (() -> Unit)? = null,
+    private val outputStreamProvider: OutputStreamProvider? = null,
+    private val inputStreamProvider: InputStreamProvider? = null,
+    private val clearFunction: CleanupProvider? = null,
     logEntryDelegate: LogEntryDelegate = LogEntryDelegateImpl(),
     coroutineScope: CoroutineScope = MainScope()
 ) : StreamLogger, LogEntryDelegate by logEntryDelegate, CoroutineScope by coroutineScope {
@@ -105,7 +110,7 @@ class StreamLoggerAsync(
 
     override fun wipeLog() {
         launch(singleThreadContext) {
-            clearFunction?.invoke()
+            clearFunction?.clean()
         }
     }
 }

@@ -1,4 +1,4 @@
-package com.skoumal.teagger
+package com.skoumal.teagger.entry
 
 import android.util.Log
 

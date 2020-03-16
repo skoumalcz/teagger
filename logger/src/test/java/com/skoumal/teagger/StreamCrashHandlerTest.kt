@@ -1,6 +1,8 @@
 package com.skoumal.teagger
 
 import com.skoumal.teagger.base.getThrowableWithStackTrace
+import com.skoumal.teagger.provider.InputStreamProvider
+import com.skoumal.teagger.provider.OutputStreamProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -11,7 +13,6 @@ import org.junit.Before
 import org.junit.Test
 import java.io.ByteArrayOutputStream
 import java.io.OutputStream
-import java.lang.IllegalArgumentException
 
 class StreamCrashHandlerTest {
 
@@ -39,7 +40,8 @@ class StreamCrashHandlerTest {
         primaryLoggedContent = ""
         fileLoggedContent = ""
 
-        primaryOutputStreamProvider = object : OutputStreamProvider {
+        primaryOutputStreamProvider = object :
+            OutputStreamProvider {
             override fun provideOutputStream() = object : ByteArrayOutputStream() {
                 override fun close() {
                     super.close()
@@ -49,7 +51,8 @@ class StreamCrashHandlerTest {
 
         }
 
-        primaryInputStreamProvider = object : InputStreamProvider {
+        primaryInputStreamProvider = object :
+            InputStreamProvider {
             override fun provideInputStream() = primaryLoggedContent.byteInputStream()
         }
 
@@ -59,7 +62,8 @@ class StreamCrashHandlerTest {
                 primaryClearCallback
         )
 
-        fileOutputStreamProvider = object : OutputStreamProvider {
+        fileOutputStreamProvider = object :
+            OutputStreamProvider {
             override fun provideOutputStream() = object : ByteArrayOutputStream() {
                 override fun close() {
                     super.close()
@@ -69,7 +73,8 @@ class StreamCrashHandlerTest {
 
         }
 
-        fileInputStreamProvider = object : InputStreamProvider {
+        fileInputStreamProvider = object :
+            InputStreamProvider {
             override fun provideInputStream() = fileLoggedContent.byteInputStream()
         }
 
@@ -102,7 +107,8 @@ class StreamCrashHandlerTest {
 
     @Test
     fun handleCrash_logsToFileOnError() {
-        primaryLogger.outputStreamProvider = object : OutputStreamProvider {
+        primaryLogger.outputStreamProvider = object :
+            OutputStreamProvider {
             override fun provideOutputStream(): OutputStream? {
                 throw IllegalArgumentException()
             }

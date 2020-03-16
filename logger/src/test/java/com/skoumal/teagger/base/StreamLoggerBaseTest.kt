@@ -2,6 +2,9 @@ package com.skoumal.teagger.base
 
 import android.util.Log
 import com.skoumal.teagger.*
+import com.skoumal.teagger.entry.LogEntryDelegate
+import com.skoumal.teagger.provider.InputStreamProvider
+import com.skoumal.teagger.provider.OutputStreamProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
@@ -25,9 +28,9 @@ abstract class StreamLoggerBaseTest {
     }
 
     abstract fun createLogger(
-            outputProvider: OutputStreamProvider,
-            inputProvider: InputStreamProvider,
-            clearCallback: () -> Unit
+        outputProvider: OutputStreamProvider,
+        inputProvider: InputStreamProvider,
+        clearCallback: () -> Unit
     ): StreamLogger
 
     abstract fun getLogEntryDelegate(streamLogger: StreamLogger): LogEntryDelegate
@@ -37,7 +40,8 @@ abstract class StreamLoggerBaseTest {
     fun prepare() {
         loggedContent = ""
 
-        outputStreamProvider = object : OutputStreamProvider {
+        outputStreamProvider = object :
+            OutputStreamProvider {
             override fun provideOutputStream() = object : ByteArrayOutputStream() {
                 override fun close() {
                     super.close()
@@ -46,7 +50,8 @@ abstract class StreamLoggerBaseTest {
             }
         }
 
-        inputStreamProvider = object : InputStreamProvider {
+        inputStreamProvider = object :
+            InputStreamProvider {
             override fun provideInputStream() = loggedContent.byteInputStream()
         }
 

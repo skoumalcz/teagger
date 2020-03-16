@@ -1,6 +1,8 @@
 package com.skoumal.teagger
 
 import android.util.Log
+import com.skoumal.teagger.entry.LogEntryDelegate
+import com.skoumal.teagger.entry.LogEntryDelegateImpl
 import org.junit.Before
 import org.junit.Test
 
