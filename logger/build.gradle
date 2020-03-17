@@ -1,49 +1,15 @@
 plugins {
     id("com.android.library")
-    id("kotlin-android")
-    id("kotlin-kapt")
     id("com.github.dcendents.android-maven")
     id("teanity")
-}
-
-android {
-    dataBinding {
-        enabled = true
-    }
-}
-
-teanity {
-    modules {
-        useUI = true
-    }
 }
 
 dependencies {
 
     implementation(Lib.kotlin.lib)
     implementation(Lib.kotlin.coroutines)
-    implementation(Lib.kotlin.coroutinesTest)
 
-    /* === SUPPORT === */
-    api(Lib.androidx.appcompat)
-
-    /* === CORE === */
     api(Lib.androidx.core)
-    api(Lib.lifecycle.extensions)
-    api(Lib.lifecycle.viewModel)
-    api(Lib.navigation.fragment)
-    api(Lib.navigation.ui)
-
-    /* === RX === */
-    api(Lib.reactive.kotlin)
-    api(Lib.reactive.android)
-
-    /* === EASING === */
-    implementation(Lib.state)
-    implementation(Lib.dexter)
-    api(Lib.timber)
-    api(Lib.bindingCollection.collections)
-    api(Lib.bindingCollection.recycler)
 
 }
 

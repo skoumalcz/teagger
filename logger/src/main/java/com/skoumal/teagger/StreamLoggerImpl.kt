@@ -2,6 +2,7 @@ package com.skoumal.teagger
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import com.skoumal.teagger.coroutine.IOScope
 import com.skoumal.teagger.crash.StreamCrashHandler
 import com.skoumal.teagger.entry.LogEntryDelegate
@@ -15,7 +16,6 @@ import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.channels.Channel.Factory.BUFFERED
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.consumeAsFlow
-import timber.log.Timber
 import java.io.File
 import java.io.PrintStream
 import java.io.PrintWriter
@@ -150,7 +150,7 @@ internal class StreamLoggerImpl(
             }
             Constants.fatalFile.deleteRecursively()
         }.onFailure {
-            Timber.e("Draining fatal error resulted in error. Both streams must be accessible!")
+            Log.e(TAG, "Draining fatal error resulted in error. Both streams must be accessible!")
         }
     }
 

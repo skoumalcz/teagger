@@ -52,3 +52,5 @@ private fun StreamLogger.log(priority: Int, tag: String, message: String?, throw
         log(throwable)
     }
 }
+
+val Any.TAG get() = this::class.java.simpleName.orEmpty()
