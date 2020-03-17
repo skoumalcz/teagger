@@ -1,0 +1,20 @@
+plugins {
+    id("com.android.library")
+    id("com.github.dcendents.android-maven")
+    id("teanity")
+}
+
+dependencies {
+
+    implementation(Lib.kotlin.lib)
+    implementation(Lib.kotlin.coroutines)
+
+    compileOnly(project(":logger"))
+
+    api(Lib.other.timber)
+
+}
+
+afterEvaluate {
+    apply from: "../../groovy.gradle"
+}

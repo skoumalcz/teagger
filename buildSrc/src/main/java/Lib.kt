@@ -11,12 +11,14 @@ object Lib {
         }
 
         // this is kinda deprecated
+        const val timber = "4.7.1"
         const val maven = "2.1"
     }
 
     //region Access definitions
     val kotlin = Kotlin
     val androidx = AndroidX
+    val other = Other
     //endregion
 
     object Kotlin {
@@ -28,6 +30,10 @@ object Lib {
     object AndroidX {
         val build = "com.android.tools.build:gradle:${V.gradle}"
         val core = androidx("core", "core-ktx", V.AndroidX.core)
+    }
+
+    object Other {
+        const val timber = "com.jakewharton.timber:timber:${V.timber}"
     }
 
     const val maven = "com.github.dcendents:android-maven-gradle-plugin:${V.maven}"
