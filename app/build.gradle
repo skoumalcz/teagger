@@ -36,6 +36,6 @@ teanity {
 
 dependencies {
     implementation(project(":logger"))
-    implementation(project(":logger-ui"))
+    implementation(project(":logger:ui"))
     implementation(project(":logger:timber"))
 }

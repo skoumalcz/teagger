@@ -1,4 +1,5 @@
 rootProject.buildFileName = "build.gradle.kts"
 
-include ':logger', ':logger-ui', ':app'
+include ':logger', ':app'
 include ':logger:timber'
+include ':logger:ui'

@@ -21,7 +21,7 @@ teanity {
 
 dependencies {
 
-    implementation(project(":logger"))
+    compileOnly(project(":logger"))
 
     implementation(Lib.kotlin.lib)
     implementation(Lib.kotlin.coroutines)
@@ -29,5 +29,5 @@ dependencies {
 }
 
 afterEvaluate {
-    apply from: "../groovy.gradle"
+    apply from: "../../groovy.gradle"
 }
