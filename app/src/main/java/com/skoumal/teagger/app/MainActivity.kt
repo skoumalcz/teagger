@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import com.skoumal.teagger.ui.LoggerActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
 import java.util.*
@@ -33,7 +34,7 @@ class MainActivity : AppCompatActivity() {
 
         main_crash.setOnClickListener { 0 / 0 }
         main_share.setOnClickListener {
-            startActivity(Intent(this, MyLoggerActivity::class.java))
+            startActivity(Intent(this, LoggerActivity::class.java))
         }
     }
 }

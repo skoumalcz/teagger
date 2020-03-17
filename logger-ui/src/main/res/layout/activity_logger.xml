@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
 
@@ -9,46 +10,50 @@
             type="com.skoumal.teagger.ui.LoggerViewModel" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <androidx.recyclerview.widget.RecyclerView
-            itemBinding="@{viewModel.binding}"
+            itemBinding="@{viewModel.itemBinding}"
             items="@{viewModel.items}"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:reverseLayout="true"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:layout_constraintBottom_toTopOf="@id/logger_send"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:reverseLayout="true"
+            tools:listitem="@layout/item_logger_line" />
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/logger_send"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="@{() -> viewModel.sendLog()}"
-            android:text="@string/share"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            android:layout_gravity="bottom|end"
+            android:clipToPadding="false"
+            android:gravity="end"
+            android:orientation="vertical"
+            android:padding="@dimen/l1"
+            app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior">
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="@{() -> viewModel.wipeLog()}"
-            android:text="@string/wipe"
-            android:id="@+id/logger_wipe"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/logger_send" />
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginBottom="@dimen/l1"
+                android:onClick="@{() -> viewModel.wipeLog()}"
+                app:backgroundTint="?colorError"
+                app:fabSize="mini"
+                app:maxImageSize="20dp"
+                app:srcCompat="@drawable/ic_teagger_delete"
+                app:tint="?colorOnError" />
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="@{() -> viewModel.sampleLog()}"
-            android:text="New Entry"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/logger_wipe" />
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="@{(view) -> viewModel.shareLog(view.context)}"
+                app:srcCompat="@drawable/ic_teagger_share" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
+
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 </layout>

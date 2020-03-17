@@ -6,6 +6,11 @@ import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
+suspend fun StreamLogger.shareLog(
+    context: Context,
+    authority: Int
+) = shareLog(context, context.getString(authority))
+
 /**
  * Opens a share activity for a log file.
  * @param scope the [kotlinx.coroutines.CoroutineScope] that will be used to create the file

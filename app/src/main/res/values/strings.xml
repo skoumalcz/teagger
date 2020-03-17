@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Teagger app</string>
+    <string name="teagger_log_share_authority">com.teagger.fileprovider</string>
 </resources>

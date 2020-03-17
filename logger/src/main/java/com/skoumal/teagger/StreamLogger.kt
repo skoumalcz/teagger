@@ -30,18 +30,25 @@ interface StreamLogger {
         private var _context: WeakReference<Context>? = null
         internal val context get() = _context?.get()!!
 
+        lateinit var instance: StreamLogger
+            private set
+
         @JvmStatic
         @JvmName("withFile")
         operator fun invoke(context: Context, file: File): StreamLogger {
             _context = WeakReference(context.applicationContext)
-            return StreamLoggerImpl(FileProvider(file))
+            return StreamLoggerImpl(FileProvider(file)).also {
+                instance = it
+            }
         }
 
         @JvmStatic
         @JvmName("withContext")
         operator fun invoke(context: Context): StreamLogger {
             _context = WeakReference(context.applicationContext)
-            return StreamLoggerImpl(FileProvider())
+            return StreamLoggerImpl(FileProvider()).also {
+                instance = it
+            }
         }
 
         @JvmStatic
@@ -53,7 +60,9 @@ interface StreamLogger {
             cleanup: CleanupProvider? = null
         ): StreamLogger {
             _context = WeakReference(context.applicationContext)
-            return StreamLoggerImpl(inputStream, outputStream, cleanup)
+            return StreamLoggerImpl(inputStream, outputStream, cleanup).also {
+                instance = it
+            }
         }
 
     }

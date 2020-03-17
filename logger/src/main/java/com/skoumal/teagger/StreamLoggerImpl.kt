@@ -71,13 +71,13 @@ internal class StreamLoggerImpl(
         throwable: Throwable
     ) = withContext(Dispatchers.IO) {
         PrintStream(outputStream.provideOrDefault()).use { stream ->
-            stream.print("$line: ")
+            stream.print(line)
             throwable.printStackTrace(stream)
             stream.println()
         }
         getChannelForSend()?.let {
             val writer = StringWriter().also {
-                it.write("$line: ")
+                it.write(line)
             }
             PrintWriter(writer).use {
                 throwable.printStackTrace(it)
@@ -111,8 +111,8 @@ internal class StreamLoggerImpl(
         return getOrCreateChannel().openSubscription().consumeAsFlow()
     }
 
-    override suspend fun clear(): Boolean {
-        return cleanup?.clean() ?: false
+    override suspend fun clear(): Boolean = withContext(Dispatchers.IO) {
+        cleanup?.clean() ?: false
     }
 
     // Private members

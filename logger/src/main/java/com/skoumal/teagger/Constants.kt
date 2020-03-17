@@ -12,7 +12,7 @@ object Constants {
 
     const val CRASH_DEFAULT_PRIORITY = Log.ERROR
     const val CRASH_DEFAULT_TAG = "Crash"
-    const val CRASH_DEFAULT_MESSAGE = "The application has crashed: "
+    const val CRASH_DEFAULT_MESSAGE = "The application has crashed"
 
     private val cacheFolder
         get() = File(StreamLogger.context.cacheDir, INTERNAL_DIR).createFoldersIfMissing()

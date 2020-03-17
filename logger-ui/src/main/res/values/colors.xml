@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="logger_color_assert">#FF0000</color>
+    <color name="logger_color_debug">#189F00</color>
+    <color name="logger_color_error">#B60000</color>
+    <color name="logger_color_info">#00A0AE</color>
+    <color name="logger_color_verbose">#707070</color>
+    <color name="logger_color_warn">#D5C005</color>
+    <color name="logger_color_default">#000</color>
+
+</resources>
