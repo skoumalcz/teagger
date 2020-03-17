@@ -15,9 +15,9 @@ object Constants {
     const val CRASH_DEFAULT_MESSAGE = "The application has crashed"
 
     private val cacheFolder
-        get() = File(StreamLogger.context.cacheDir, INTERNAL_DIR).createFoldersIfMissing()
+        get() = File(Teagger.context.cacheDir, INTERNAL_DIR).createFoldersIfMissing()
     private val fileFolder
-        get() = File(StreamLogger.context.filesDir, INTERNAL_DIR).createFoldersIfMissing()
+        get() = File(Teagger.context.filesDir, INTERNAL_DIR).createFoldersIfMissing()
 
     internal val fatalFile get() = File(fileFolder, FATAL_LOG_FILE).createFileIfMissing()
     internal val crashFile get() = File(fileFolder, CRASH_LOG_FILE).createFileIfMissing()

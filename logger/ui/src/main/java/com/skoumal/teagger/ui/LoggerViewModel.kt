@@ -1,7 +1,7 @@
 package com.skoumal.teagger.ui
 
 import androidx.appcompat.app.AppCompatActivity
-import com.skoumal.teagger.StreamLogger
+import com.skoumal.teagger.Teagger
 import com.skoumal.teagger.i
 import com.skoumal.teanity.viewevent.base.ActivityExecutor
 import com.skoumal.teanity.viewevent.base.ViewEvent
@@ -20,7 +20,7 @@ class LoggerViewModel : TeanityViewModel(), LoggerDataProvider by LoggerDataProv
     }
 
     fun sampleLog() {
-        StreamLogger.instance.i("Test", "${System.currentTimeMillis()}", null)
+        Teagger.instance.i("Test", "${System.currentTimeMillis()}", null)
     }
 
     object FinishActivityEvent : ViewEvent(), ActivityExecutor {

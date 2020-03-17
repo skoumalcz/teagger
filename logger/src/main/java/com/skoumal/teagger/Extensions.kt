@@ -6,7 +6,7 @@ import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-suspend fun StreamLogger.shareLog(
+suspend fun Teagger.shareLog(
     context: Context,
     authority: Int
 ) = shareLog(context, context.getString(authority))
@@ -17,7 +17,7 @@ suspend fun StreamLogger.shareLog(
  * @param context can be application context, will be used to get the URI and start the activity
  * @param authority authority of the [androidx.core.content.FileProvider] that has access to the teagger/ directory in cache
  */
-suspend fun StreamLogger.shareLog(
+suspend fun Teagger.shareLog(
     context: Context,
     authority: String
 ) = withContext(Dispatchers.Main) {
@@ -31,25 +31,25 @@ suspend fun StreamLogger.shareLog(
     context.startActivity(shareIntent)
 }
 
-fun StreamLogger.v(tag: String, message: String?, throwable: Throwable?) =
+fun Teagger.v(tag: String, message: String?, throwable: Throwable?) =
     log(Log.VERBOSE, tag, message, throwable)
 
-fun StreamLogger.d(tag: String, message: String?, throwable: Throwable?) =
+fun Teagger.d(tag: String, message: String?, throwable: Throwable?) =
     log(Log.DEBUG, tag, message, throwable)
 
-fun StreamLogger.i(tag: String, message: String?, throwable: Throwable?) =
+fun Teagger.i(tag: String, message: String?, throwable: Throwable?) =
     log(Log.INFO, tag, message, throwable)
 
-fun StreamLogger.w(tag: String, message: String?, throwable: Throwable?) =
+fun Teagger.w(tag: String, message: String?, throwable: Throwable?) =
     log(Log.WARN, tag, message, throwable)
 
-fun StreamLogger.e(tag: String, message: String?, throwable: Throwable?) =
+fun Teagger.e(tag: String, message: String?, throwable: Throwable?) =
     log(Log.ERROR, tag, message, throwable)
 
-fun StreamLogger.wtf(tag: String, message: String?, throwable: Throwable?) =
+fun Teagger.wtf(tag: String, message: String?, throwable: Throwable?) =
     log(Log.ASSERT, tag, message, throwable)
 
-private fun StreamLogger.log(priority: Int, tag: String, message: String?, throwable: Throwable?) {
+private fun Teagger.log(priority: Int, tag: String, message: String?, throwable: Throwable?) {
     if (message != null) {
         log(priority, tag, message)
     }

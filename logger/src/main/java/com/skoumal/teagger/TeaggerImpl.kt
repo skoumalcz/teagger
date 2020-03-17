@@ -24,11 +24,11 @@ import java.util.concurrent.Executors
 import androidx.core.content.FileProvider as AndroidFileProvider
 
 @UseExperimental(ExperimentalCoroutinesApi::class, FlowPreview::class)
-internal class StreamLoggerImpl(
+internal class TeaggerImpl(
     private val inputStream: InputStreamProvider,
     private val outputStream: OutputStreamProvider,
     private val cleanup: CleanupProvider? = null
-) : StreamLogger, CoroutineScope by IOScope() {
+) : Teagger, CoroutineScope by IOScope() {
 
     constructor(provider: FileProvider) : this(provider, provider, provider)
 

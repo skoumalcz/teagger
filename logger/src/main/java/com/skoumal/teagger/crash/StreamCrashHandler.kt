@@ -1,9 +1,9 @@
 package com.skoumal.teagger.crash
 
-import com.skoumal.teagger.StreamLogger
+import com.skoumal.teagger.Teagger
 
 internal class StreamCrashHandler(
-    private val logger: StreamLogger
+    private val logger: Teagger
 ) {
 
     init {

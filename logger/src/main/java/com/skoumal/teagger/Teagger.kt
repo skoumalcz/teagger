@@ -12,7 +12,7 @@ import java.io.File
 import java.lang.ref.WeakReference
 
 
-interface StreamLogger {
+interface Teagger {
 
     var entryTransformer: LogEntryDelegate
 
@@ -30,23 +30,23 @@ interface StreamLogger {
         private var _context: WeakReference<Context>? = null
         internal val context get() = _context?.get()!!
 
-        lateinit var instance: StreamLogger
+        lateinit var instance: Teagger
             private set
 
         @JvmStatic
         @JvmName("withFile")
-        operator fun invoke(context: Context, file: File): StreamLogger {
+        operator fun invoke(context: Context, file: File): Teagger {
             _context = WeakReference(context.applicationContext)
-            return StreamLoggerImpl(FileProvider(file)).also {
+            return TeaggerImpl(FileProvider(file)).also {
                 instance = it
             }
         }
 
         @JvmStatic
         @JvmName("withContext")
-        operator fun invoke(context: Context): StreamLogger {
+        operator fun invoke(context: Context): Teagger {
             _context = WeakReference(context.applicationContext)
-            return StreamLoggerImpl(FileProvider()).also {
+            return TeaggerImpl(FileProvider()).also {
                 instance = it
             }
         }
@@ -58,9 +58,9 @@ interface StreamLogger {
             inputStream: InputStreamProvider,
             outputStream: OutputStreamProvider,
             cleanup: CleanupProvider? = null
-        ): StreamLogger {
+        ): Teagger {
             _context = WeakReference(context.applicationContext)
-            return StreamLoggerImpl(inputStream, outputStream, cleanup).also {
+            return TeaggerImpl(inputStream, outputStream, cleanup).also {
                 instance = it
             }
         }

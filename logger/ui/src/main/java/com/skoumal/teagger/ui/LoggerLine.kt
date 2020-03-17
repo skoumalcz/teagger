@@ -4,7 +4,7 @@ import android.util.Log
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.databinding.BindingAdapter
-import com.skoumal.teagger.StreamLogger
+import com.skoumal.teagger.Teagger
 import com.skoumal.teanity.databinding.GenericRvItem
 import com.skoumal.teanity.extensions.compareToSafe
 
@@ -35,7 +35,7 @@ sealed class LoggerLine(
         @JvmName("withLine")
         operator fun invoke(
             line: String
-        ) = when (StreamLogger.instance.entryTransformer.resolvePriorityForEntry(line)) {
+        ) = when (Teagger.instance.entryTransformer.resolvePriorityForEntry(line)) {
             Log.ASSERT -> Assert(line)
             Log.DEBUG -> Debug(line)
             Log.ERROR -> Error(line)

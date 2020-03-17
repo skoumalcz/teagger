@@ -15,9 +15,9 @@ import org.junit.Before
 import org.junit.Test
 import java.io.ByteArrayOutputStream
 
-abstract class StreamLoggerBaseTest {
+abstract class TeaggerBaseTest {
 
-    private lateinit var logger: StreamLogger
+    private lateinit var logger: Teagger
     private lateinit var logEntryDelegate: LogEntryDelegate
     private lateinit var loggedContent: String
 
@@ -31,9 +31,9 @@ abstract class StreamLoggerBaseTest {
         outputProvider: OutputStreamProvider,
         inputProvider: InputStreamProvider,
         clearCallback: () -> Unit
-    ): StreamLogger
+    ): Teagger
 
-    abstract fun getLogEntryDelegate(streamLogger: StreamLogger): LogEntryDelegate
+    abstract fun getLogEntryDelegate(teagger: Teagger): LogEntryDelegate
 
     @ExperimentalCoroutinesApi
     @Before
@@ -61,7 +61,7 @@ abstract class StreamLoggerBaseTest {
         Dispatchers.setMain(TestCoroutineDispatcher())
     }
 
-    abstract fun testLogMethod(logger: StreamLogger, logBlock: () -> Unit, assertBlock: () -> Unit)
+    abstract fun testLogMethod(logger: Teagger, logBlock: () -> Unit, assertBlock: () -> Unit)
 
     @Test
     fun log_appendsEntries() {
