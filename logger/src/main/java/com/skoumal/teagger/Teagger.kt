@@ -28,43 +28,57 @@ interface Teagger {
     companion object {
 
         private var _context: WeakReference<Context>? = null
-        internal val context get() = _context?.get()!!
+        internal var context
+            get() = _context?.get()!!
+            set(value) {
+                _context?.clear()
+                _context = WeakReference(value.applicationContext)
+            }
+
+        val isInitialized get() = this::instance.isInitialized
 
         lateinit var instance: Teagger
             private set
 
-        @JvmStatic
-        @JvmName("withFile")
-        operator fun invoke(context: Context, file: File): Teagger {
-            _context = WeakReference(context.applicationContext)
-            return TeaggerImpl(FileProvider(file)).also {
-                instance = it
-            }
+        fun start(context: Context, body: Initializer.() -> Unit): Teagger {
+            this.context = context
+            return start(body)
         }
 
-        @JvmStatic
-        @JvmName("withContext")
-        operator fun invoke(context: Context): Teagger {
-            _context = WeakReference(context.applicationContext)
+        // This should remain invisible to users as it skips setting context for TEST ONLY!
+        internal inline fun start(body: Initializer.() -> Unit): Teagger {
+            val init = Initializer().also(body)
+            if (!isInitialized) {
+                init.asDefault()
+            }
+            return instance
+        }
+
+    }
+
+    class Initializer internal constructor() {
+
+        internal fun asDefault(): Teagger {
             return TeaggerImpl(FileProvider()).also {
                 instance = it
             }
         }
 
-        @JvmStatic
-        @JvmName("withProviders")
-        operator fun invoke(
-            context: Context,
-            inputStream: InputStreamProvider,
-            outputStream: OutputStreamProvider,
-            cleanup: CleanupProvider? = null
-        ): Teagger {
-            _context = WeakReference(context.applicationContext)
-            return TeaggerImpl(inputStream, outputStream, cleanup).also {
+        fun withFile(file: File): Teagger {
+            return TeaggerImpl(FileProvider(file)).also {
                 instance = it
             }
         }
 
+        fun withProviders(
+            inputStream: InputStreamProvider,
+            outputStream: OutputStreamProvider,
+            cleanup: CleanupProvider? = null
+        ): Teagger {
+            return TeaggerImpl(inputStream, outputStream, cleanup).also {
+                instance = it
+            }
+        }
     }
 
 }

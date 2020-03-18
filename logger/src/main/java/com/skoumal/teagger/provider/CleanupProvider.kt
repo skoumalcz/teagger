@@ -10,8 +10,3 @@ interface CleanupProvider {
     fun clean(): Boolean
 
 }
-
-internal fun Any.clean() = when (this) {
-    is CleanupProvider -> clean()
-    else -> false
-}

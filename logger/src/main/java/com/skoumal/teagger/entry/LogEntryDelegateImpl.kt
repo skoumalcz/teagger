@@ -1,6 +1,7 @@
 package com.skoumal.teagger.entry
 
 import android.util.Log
+import androidx.annotation.VisibleForTesting
 import com.skoumal.teagger.Constants
 import java.text.DateFormat
 
@@ -39,8 +40,12 @@ internal class LogEntryDelegateImpl : LogEntryDelegate {
 
     companion object {
         private val format = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM)
-        private const val priorityName = "Default/"
-        private val priorities = mapOf(
+
+        @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+        const val priorityName = "Default/"
+
+        @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+        val priorities = mapOf(
             Log.ASSERT to "A/",
             Log.DEBUG to "D/",
             Log.ERROR to "E/",

@@ -25,6 +25,7 @@ object Lib {
         val lib = kotlin("stdlib-jdk7", V.kotlin)
         val gradle = kotlin("gradle-plugin", V.kotlin)
         val coroutines = kotlinx("coroutines-android", V.kotlinCoroutines)
+        val coroutinesTest = kotlinx("coroutines-test", V.kotlinCoroutines)
     }
 
     object AndroidX {

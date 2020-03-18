@@ -75,8 +75,8 @@ abstract class TeaggerBaseTest {
         val exceptionName = throwable::class.java.name
 
         val logBlock = {
-            logger.log(Log.DEBUG, tag, message1, null)
-            logger.log(Log.WARN, tag, message2, throwable)
+            logger.log(Log.DEBUG, tag, message1)
+            logger.log(throwable)
         }
 
         testLogMethod(logger, logBlock) {
@@ -131,7 +131,9 @@ abstract class TeaggerBaseTest {
     fun wipeLog_callsCallback() {
         loggedContent = "content to be wiped"
         testLogMethod(logger, {
-            logger.clear()
+            runBlocking {
+                logger.clear()
+            }
         }, {
             assertEquals("", loggedContent)
         })
