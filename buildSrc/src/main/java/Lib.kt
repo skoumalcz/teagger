@@ -4,7 +4,7 @@ object Lib {
     private object V {
         const val kotlin = "1.3.61"
         const val kotlinCoroutines = "1.3.2"
-        const val gradle = "3.6.1"
+        const val gradle = "4.0.0-beta04"
 
         object AndroidX {
             const val core = "1.2.0-rc01"

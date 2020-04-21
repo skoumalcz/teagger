@@ -15,8 +15,6 @@ class MyApplication : Application() {
         super.onCreate()
         Timber.plant(Timber.DebugTree())
         Timber.plant(TeaggerTree())
-        teagger = Teagger.start(this) {
-            withProviders()
-        }
+        teagger = Teagger.start(this) {}
     }
 }
