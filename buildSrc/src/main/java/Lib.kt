@@ -38,7 +38,7 @@ object Lib {
     }
 
     const val maven = "com.github.dcendents:android-maven-gradle-plugin:${V.maven}"
-    const val teanity = "com.skoumal:teanity-plugin:1.0.0"
+    const val teanity = "com.skoumal:teanity-plugin:2.0.0-alpha01"
 
     // ---
 

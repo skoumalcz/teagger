@@ -14,7 +14,7 @@ import com.skoumal.teagger.provider.OutputStreamProvider
 import com.skoumal.teagger.provider.file.FileProvider
 import com.skoumal.teagger.provider.provideOrDefault
 import com.skoumal.teanity.component.channel.Vessel
-import com.skoumal.teanity.util.SubjectsToChange
+import com.skoumal.teanity.tools.annotation.SubjectsToChange
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.channels.Channel.Factory.BUFFERED

@@ -2,7 +2,7 @@ package com.skoumal.teagger.comms
 
 import com.skoumal.teagger.entry.LogEntryDelegate
 import com.skoumal.teanity.component.channel.Vessel
-import com.skoumal.teanity.util.SubjectsToChange
+import com.skoumal.teanity.tools.annotation.SubjectsToChange
 import kotlinx.coroutines.FlowPreview
 
 @UseExperimental(SubjectsToChange::class, FlowPreview::class)
